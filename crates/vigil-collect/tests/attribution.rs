@@ -75,7 +75,7 @@ async fn child_connection_is_attributed_to_child_pid() {
     let deadline = Instant::now() + Duration::from_secs(10);
     let mut saw_start = false;
     let mut connect_pid = None;
-    while Instant::now() < deadline && connect_pid.is_none() {
+    while Instant::now() < deadline && (connect_pid.is_none() || !saw_start) {
         let Ok(Some(ev)) = tokio::time::timeout(Duration::from_millis(500), rx.recv()).await else {
             continue;
         };

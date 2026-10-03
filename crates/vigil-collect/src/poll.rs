@@ -253,6 +253,23 @@ fn poll_loop<S: SnapshotSource>(
     loop {
         let now = now_ms();
         let mut events = Vec::new();
+        // Sockets are snapshotted *before* processes: any process owning a
+        // socket then also appears in the process snapshot, so its
+        // `ProcessStart` is always emitted before its `NetConnect`.
+        let sockets = if scope.tcp || scope.udp {
+            match source.sockets() {
+                Ok(s) => Some(s),
+                Err(e) => {
+                    if !warned_socks {
+                        tracing::warn!(collector = name, error = %e, "socket snapshot failed");
+                        warned_socks = true;
+                    }
+                    None
+                }
+            }
+        } else {
+            None
+        };
         if scope.processes {
             match source.processes() {
                 Ok(p) => events.extend(differ.diff_processes(&p, now)),
@@ -263,15 +280,8 @@ fn poll_loop<S: SnapshotSource>(
                 Err(_) => {}
             }
         }
-        if scope.tcp || scope.udp {
-            match source.sockets() {
-                Ok(s) => events.extend(differ.diff_sockets(&s, scope, now)),
-                Err(e) if !warned_socks => {
-                    tracing::warn!(collector = name, error = %e, "socket snapshot failed");
-                    warned_socks = true;
-                }
-                Err(_) => {}
-            }
+        if let Some(s) = sockets {
+            events.extend(differ.diff_sockets(&s, scope, now));
         }
         for ev in events {
             if tx.blocking_send(ev).is_err() {
@@ -527,6 +537,60 @@ mod tests {
                 SockState::Established,
             )])
         }
+    }
+
+    /// A child that appears between the two snapshots of a poll: each
+    /// snapshot call advances a clock, and the child exists from tick 1.
+    struct RacySource {
+        clock: u32,
+    }
+
+    impl SnapshotSource for RacySource {
+        fn processes(&mut self) -> std::io::Result<Vec<ProcSnap>> {
+            self.clock += 1;
+            let mut v = vec![p(1, 0, 10, "init")];
+            if self.clock > 1 {
+                v.push(p(9, 1, 900, "child"));
+            }
+            Ok(v)
+        }
+        fn sockets(&mut self) -> std::io::Result<Vec<SockSnap>> {
+            self.clock += 1;
+            Ok(if self.clock > 1 {
+                vec![s(
+                    9,
+                    Proto::Tcp,
+                    "10.0.0.2:50000",
+                    "198.51.100.1:443",
+                    SockState::Established,
+                )]
+            } else {
+                vec![]
+            })
+        }
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn process_start_always_precedes_its_connections() {
+        let c = PollCollector::new(
+            "racy",
+            RacySource { clock: 0 },
+            Duration::from_millis(10),
+            false,
+            PollScope::ALL,
+        );
+        let (tx, mut rx) = mpsc::channel(64);
+        let runner = tokio::spawn(async move { c.run(tx).await });
+        let mut first_for_child = None;
+        while first_for_child.is_none() {
+            let ev = rx.recv().await.unwrap();
+            if ev.pid == 9 {
+                first_for_child = Some(ev.kind.name());
+            }
+        }
+        drop(rx);
+        runner.await.unwrap().unwrap();
+        assert_eq!(first_for_child, Some("process_start"));
     }
 
     #[tokio::test(flavor = "multi_thread")]
