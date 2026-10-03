@@ -20,4 +20,5 @@ pub fn taint_engine(cfg: &Config) -> TaintEngine {
         }
     };
     TaintEngine::new(FileAnalyzer::new(yara), ProcessTracker::default())
+        .with_cache_file(cfg.paths.data_dir.join("hash-cache.tsv"))
 }

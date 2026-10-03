@@ -131,6 +131,7 @@ fn analysis_stage(
             last_tick = Instant::now();
         }
     }
+    taint.flush();
     published
 }
 

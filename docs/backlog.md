@@ -47,9 +47,6 @@ milestone expected to pick it up.
 - **Security advisories (track):** bump yara-x as soon as it moves to a patched wasmtime
   (>= 49.0.2 covers RUSTSEC-2026-0222/-0269/-0316/-0327). Then remove those ignores from
   `deny.toml`, and re-check the bincode and rsa notices.
-- **Persistent hash cache (M5, idle budget):** file digests are cached in memory only, so
-  a restart rehashes every running executable once. Persist (path, size, mtime, sha256) in
-  the store.
 - **macOS quarantine URL (M9):** read the source URL from the per-user LaunchServices
   QuarantineEventsV2 database, keyed by the quarantine UUID.
 - **Linux download watcher (M5):** files dropped into Downloads/temp by tools that set no
@@ -60,4 +57,4 @@ milestone expected to pick it up.
 - **Startup analysis latency (M5, performance budget):** on a busy machine the startup
   snapshot makes the analysis stage hash and signature-check hundreds of executables one
   after another (CI showed delays of more than 10 s). Fix with a worker pool for first-sight
-  file analysis that preserves per-PID event order, plus the persistent hash cache above.
+  file analysis that preserves per-PID event order, on top of the persistent digest cache (done: `<data_dir>/hash-cache.tsv`).

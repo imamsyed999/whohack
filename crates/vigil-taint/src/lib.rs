@@ -16,6 +16,7 @@ pub mod sign;
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 pub use analyzer::FileAnalyzer;
 pub use lineage::{ProcessTracker, StartInput};
@@ -35,16 +36,50 @@ fn process_cwd(pid: u32) -> Option<PathBuf> {
     }
 }
 
+/// How often the digest cache is persisted while running.
+const CACHE_SAVE_INTERVAL: Duration = Duration::from_secs(10 * 60);
+
 /// Pipeline stage turning events into observations with process context.
 #[derive(Debug)]
 pub struct TaintEngine {
     analyzer: FileAnalyzer,
     tracker: ProcessTracker,
+    cache_file: Option<PathBuf>,
+    last_save: Instant,
 }
 
 impl TaintEngine {
     pub fn new(analyzer: FileAnalyzer, tracker: ProcessTracker) -> Self {
-        TaintEngine { analyzer, tracker }
+        TaintEngine {
+            analyzer,
+            tracker,
+            cache_file: None,
+            last_save: Instant::now(),
+        }
+    }
+
+    /// Persists file digests in `file` across restarts (loaded now, saved
+    /// periodically and on [`flush`](Self::flush)), so a restart does not
+    /// re-hash every running executable.
+    pub fn with_cache_file(mut self, file: PathBuf) -> Self {
+        match self.analyzer.hashes_mut().load(&file) {
+            Ok(n) => tracing::info!(entries = n, "file digest cache loaded"),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => tracing::warn!(error = %e, "file digest cache unreadable; starting empty"),
+        }
+        self.cache_file = Some(file);
+        self
+    }
+
+    /// Saves the digest cache, if one is configured.
+    pub fn flush(&mut self) {
+        if let Some(file) = &self.cache_file {
+            match self.analyzer.hashes().save(file) {
+                Ok(n) => tracing::debug!(entries = n, "file digest cache saved"),
+                Err(e) => tracing::warn!(error = %e, "could not save file digest cache"),
+            }
+        }
+        self.last_save = Instant::now();
     }
 
     pub fn tracker(&self) -> &ProcessTracker {
@@ -80,9 +115,13 @@ impl TaintEngine {
         }
     }
 
-    /// Periodic housekeeping (expires exited processes).
+    /// Periodic housekeeping: expires exited processes and persists the
+    /// digest cache every few minutes.
     pub fn tick(&mut self, now_ms: i64) {
         self.tracker.expire(now_ms);
+        if self.cache_file.is_some() && self.last_save.elapsed() >= CACHE_SAVE_INTERVAL {
+            self.flush();
+        }
     }
 
     pub fn process(&self, pid: u32) -> Option<Arc<vigil_core::ProcessInfo>> {

@@ -52,8 +52,17 @@ impl FileAnalyzer {
         }
     }
 
-    /// Placeholder-free description of a file that cannot be read (it may
-    /// have been deleted, or is inaccessible): zero digest, unknown origin.
+    /// The digest cache (for persistence across restarts).
+    pub fn hashes(&self) -> &HashCache {
+        &self.hashes
+    }
+
+    pub fn hashes_mut(&mut self) -> &mut HashCache {
+        &mut self.hashes
+    }
+
+    /// Description of a file that cannot be read (it may have been deleted,
+    /// or is inaccessible): zero digest, origin from its location.
     pub fn unreadable(path: &str, now_ms: i64) -> FileInfo {
         FileInfo {
             path: path.to_string(),
