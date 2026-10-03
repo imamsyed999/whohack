@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.vigil.service</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/vigil-service</string>
+        <string>--config</string>
+        <string>/Library/Application Support/Vigil/config.toml</string>
+        <string>--run</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <!-- Watchdog: launchd restarts the service whenever it exits. -->
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>5</integer>
+    <key>ProcessType</key>
+    <string>Background</string>
+    <key>Nice</key>
+    <integer>5</integer>
+    <key>StandardErrorPath</key>
+    <string>/Library/Logs/Vigil/service.stderr.log</string>
+</dict>
+</plist>

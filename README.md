@@ -9,8 +9,15 @@ It runs entirely on your machine, on ordinary hardware with no GPU, and works al
 your OS's built-in antivirus (Microsoft Defender, XProtect, ...). It never replaces or
 disables that antivirus.
 
-> **Status: early development (milestone M0, the skeleton).** Vigil does not detect anything
-> yet. See [the roadmap](#roadmap).
+> **Status: in development.** Vigil can already do these things:
+>
+> - collect process and network activity on Linux, Windows, and macOS (limited mode);
+> - work out which programs came from the internet, and taint everything they start;
+> - store events;
+> - run as a service, with a tray app.
+>
+> It does **not** detect or block anything yet: capability tagging, detection tiers, and
+> response are still in progress. See [the roadmap](#roadmap).
 
 ## How it works
 
@@ -55,8 +62,13 @@ You need Rust stable (the version is pinned by `rust-toolchain.toml`) and a C co
 cargo test --workspace
 cargo run -p vigil-service -- --print-default-config > vigil.toml
 cargo run -p vigil-service -- --config vigil.toml --check-config
-cargo run -p vigil-service -- --config vigil.toml --init-db
+sudo ./target/debug/vigil-service --config vigil.toml --monitor   # live connections per process
+sudo ./target/debug/vigil-service --config vigil.toml --run       # the service (IPC for the tray app)
 ```
+
+The tray app lives in `ui/`; build it with `cargo build` in `ui/src-tauri`.
+`packaging/README.md` covers installing the service on each OS, and `docs/building.md`
+covers the eBPF build.
 
 `config/vigil.example.toml` documents every option.
 
@@ -81,17 +93,17 @@ Tauri tray UI, and the ML pipeline are added milestone by milestone. The full de
 
 | Milestone | Scope |
 |---|---|
-| **M0** | Skeleton: workspace, core types, config, store, logging, CI |
-| M1 | Live process + network monitoring with PID attribution |
-| M2 | Taint: download origin, hashing, signatures, YARA, lineage |
-| M3 | Capability tags + expected-behavior profiles |
-| M4 | Threat intel, Tier 0 rules, per-OS response |
-| M5 | Tier 1 anomaly scoring |
-| M6 | Tier 2 typed-decision model, fusion policy, explanations |
-| M7 | Tray UI |
-| M8 | ML pipeline + evaluation report |
-| M9 | macOS full mode (Endpoint Security + Network Extension) |
-| M10 | Signed installers, watchdog, integrity checks |
+| M0 | ✅ Skeleton: workspace, core types, config, store, logging, CI |
+| M1 | ✅ Live process + network monitoring with PID attribution (Linux eBPF/procfs, Windows ETW/polling, macOS limited) |
+| M2 | ✅ Taint: download origin, hashing, signatures, YARA, lineage |
+| M3 | ⏳ Capability tags + expected-behavior profiles |
+| M4 | ⏳ Threat intel, Tier 0 rules, per-OS response |
+| M5 | ⏳ Tier 1 anomaly scoring |
+| M6 | 🟡 Tier 2: decision-model interface, sidecar client, and mock are done; state builder and fusion are pending |
+| M7 | 🟡 Tray UI (alerts, timeline, trusted list, mode, notifications) and IPC are done; awaiting detection output |
+| M8 | ⏳ ML pipeline + evaluation report (model research done: `docs/research/decision-models.md`) |
+| M9 | ⛔ macOS full mode: needs Apple-granted entitlements |
+| M10 | 🟡 Service install (Windows service, systemd, launchd), watchdog restarts, and integrity manifest are done; signed installers need certificates |
 
 ## Testing safely
 

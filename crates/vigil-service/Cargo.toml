@@ -12,6 +12,7 @@ ebpf = ["vigil-collect/ebpf"]
 
 [dependencies]
 anyhow.workspace = true
+sha2.workspace = true
 clap.workspace = true
 tokio.workspace = true
 tracing.workspace = true
@@ -22,6 +23,9 @@ vigil-collect.workspace = true
 vigil-intel.workspace = true
 vigil-ipc.workspace = true
 vigil-taint.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-service.workspace = true
 
 [dev-dependencies]
 async-trait.workspace = true

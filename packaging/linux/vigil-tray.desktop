@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Vigil
+Comment=Vigil anti-hack protection: alerts and controls
+Exec=/usr/bin/vigil-tray
+Icon=vigil
+Terminal=false
+Categories=System;Security;
+X-GNOME-Autostart-enabled=true

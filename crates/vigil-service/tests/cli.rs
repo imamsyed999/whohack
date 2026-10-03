@@ -26,11 +26,13 @@ fn stderr(o: &Output) -> String {
     String::from_utf8_lossy(&o.stderr).into_owned()
 }
 
-/// Writes a config whose data/log dirs live inside `dir`. `extra` goes first
-/// so top-level keys are not swallowed by the `[paths]` table.
+/// Writes a config whose data/log/rules dirs live inside `dir`. `extra` goes
+/// first so top-level keys are not swallowed by the `[paths]` table.
 fn write_config(dir: &Path, extra: &str) -> PathBuf {
     let path = dir.join("config.toml");
-    let body = format!("{extra}\n[paths]\ndata_dir = \"data\"\nlog_dir = \"logs\"\n");
+    let body = format!(
+        "{extra}\n[paths]\ndata_dir = \"data\"\nlog_dir = \"logs\"\nrules_dir = \"rules\"\n"
+    );
     std::fs::write(&path, body).unwrap();
     path
 }
@@ -238,4 +240,20 @@ async fn run_mode_serves_authenticated_ipc() {
     assert!(Client::connect(s2, "wrong").await.is_err());
     let _ = child.kill();
     let _ = child.wait();
+}
+
+#[test]
+fn write_manifest_covers_rules_and_config() {
+    let dir = tempfile::tempdir().unwrap();
+    let cfg = write_config(dir.path(), "");
+    let rules = dir.path().join("rules").join("yara");
+    std::fs::create_dir_all(&rules).unwrap();
+    std::fs::write(rules.join("t.yar"), "rule t { condition: false }").unwrap();
+    let o = run(&["--config", cfg.to_str().unwrap(), "--write-manifest"]);
+    assert!(o.status.success(), "{}", stderr(&o));
+    assert!(stdout(&o).contains("manifest written"));
+    let manifest =
+        std::fs::read_to_string(dir.path().join("rules").join("MANIFEST.sha256")).unwrap();
+    assert!(manifest.contains("yara/t.yar"), "{manifest}");
+    assert!(manifest.contains("config.toml"), "{manifest}");
 }

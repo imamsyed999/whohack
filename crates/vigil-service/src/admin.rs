@@ -29,6 +29,13 @@ pub fn check_config(path: &Path) -> Result<()> {
     Ok(())
 }
 
+pub fn write_manifest(path: &Path) -> Result<()> {
+    let cfg = load_config(path)?;
+    let manifest = crate::integrity::write_manifest(&cfg.paths.rules_dir, Some(path))?;
+    println!("manifest written: {}", manifest.display());
+    Ok(())
+}
+
 pub fn init_db(path: &Path) -> Result<()> {
     let cfg = load_config(path)?;
     let _log = logging::init(&cfg.logging, &cfg.paths.log_dir)?;

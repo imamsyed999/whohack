@@ -184,21 +184,64 @@ impl Running {
     }
 }
 
-/// `--run`: the long-running service (collection, storage, IPC).
-pub fn run(cfg: &Config) -> Result<()> {
+/// How often detection content and config are re-verified.
+const INTEGRITY_INTERVAL: Duration = Duration::from_secs(10 * 60);
+
+/// Verifies the integrity manifest; logs and pushes a health alert on problems.
+fn check_integrity(
+    cfg: &Config,
+    config_path: &std::path::Path,
+    pushes: &broadcast::Sender<PushEvent>,
+) {
+    match crate::integrity::verify(&cfg.paths.rules_dir, Some(config_path)) {
+        Ok(problems) if problems.is_empty() => tracing::debug!("integrity check passed"),
+        Ok(problems) => {
+            let message = format!(
+                "Detection rules or configuration changed outside Vigil: {}",
+                problems
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            );
+            tracing::error!("{message}");
+            let _ = pushes.send(PushEvent::Health { ok: false, message });
+        }
+        Err(e) => tracing::error!(error = %e, "integrity check failed to run"),
+    }
+}
+
+/// `--run`: the long-running service (collection, storage, IPC, integrity),
+/// until Ctrl-C or SIGTERM.
+pub fn run(cfg: &Config, config_path: &std::path::Path) -> Result<()> {
+    run_until(cfg, config_path, shutdown_signal())
+}
+
+/// Runs the service until `stop` resolves (a signal, or a service-manager stop).
+pub fn run_until<F: std::future::Future<Output = ()>>(
+    cfg: &Config,
+    config_path: &std::path::Path,
+    stop: F,
+) -> Result<()> {
     let _log = crate::logging::init(&cfg.logging, &cfg.paths.log_dir)?;
     block_on(async {
         let bus = EventBus::<Observation>::new(BUS_CAPACITY);
-        let running = start(
-            cfg,
-            Options {
-                store: true,
-                ipc: true,
-            },
-            bus,
-        )
-        .await?;
-        shutdown_signal().await;
+        let opts = Options {
+            store: true,
+            ipc: true,
+        };
+        let running = start(cfg, opts, bus).await?;
+        check_integrity(cfg, config_path, &running.pushes);
+        let mut ticker = tokio::time::interval(INTEGRITY_INTERVAL);
+        ticker.tick().await; // the first tick is immediate
+        let signal = stop;
+        tokio::pin!(signal);
+        loop {
+            tokio::select! {
+                _ = &mut signal => break,
+                _ = ticker.tick() => check_integrity(cfg, config_path, &running.pushes),
+            }
+        }
         running.shutdown().await;
         Ok(())
     })

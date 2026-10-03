@@ -30,6 +30,25 @@ fn run(cli: &Cli) -> Result<()> {
             let cfg = admin::load_config(&config_path)?;
             monitor::run(&cfg, cli.duration_secs, cli.no_store)
         }
-        Command::Run => service::run(&admin::load_config(&config_path)?),
+        Command::Run => service::run(&admin::load_config(&config_path)?, &config_path),
+        Command::WriteManifest => admin::write_manifest(&config_path),
+        #[cfg(windows)]
+        Command::InstallService => {
+            vigil_service::winservice::install(&config_path)?;
+            println!("Vigil service installed and started");
+            Ok(())
+        }
+        #[cfg(windows)]
+        Command::UninstallService => {
+            vigil_service::winservice::uninstall()?;
+            println!("Vigil service removed");
+            Ok(())
+        }
+        #[cfg(windows)]
+        Command::Service => vigil_service::winservice::dispatch(config_path),
+        #[cfg(not(windows))]
+        Command::InstallService | Command::UninstallService | Command::Service => anyhow::bail!(
+            "service installation on this OS is handled by the package (systemd unit / launchd plist); see packaging/README.md"
+        ),
     }
 }

@@ -37,6 +37,7 @@ toml = "1.1.6"
 tracing = "0.1.44"
 tracing-appender = "0.2.5"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
+windows-service = "0.8.1"
 windows-sys = "0.61.2"
 yara-x = { version = "1.21.0", default-features = false, features = [
     "constant-folding",

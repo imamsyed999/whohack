@@ -50,6 +50,22 @@ struct ActionArgs {
     /// Run the service: collect, analyze, store, and serve the tray UI over IPC.
     #[arg(long)]
     run: bool,
+
+    /// Regenerate the integrity manifest for the rules directory and config file.
+    #[arg(long)]
+    write_manifest: bool,
+
+    /// Windows: register Vigil as an auto-start service and start it (administrator).
+    #[arg(long)]
+    install_service: bool,
+
+    /// Windows: stop and remove the Vigil service (administrator).
+    #[arg(long)]
+    uninstall_service: bool,
+
+    /// Windows: entry point used by the Service Control Manager.
+    #[arg(long, hide = true)]
+    service: bool,
 }
 
 /// The single action selected on the command line.
@@ -60,6 +76,10 @@ pub enum Command {
     InitDb,
     Monitor,
     Run,
+    WriteManifest,
+    InstallService,
+    UninstallService,
+    Service,
 }
 
 impl Cli {
@@ -85,8 +105,16 @@ impl Cli {
             Command::InitDb
         } else if a.monitor {
             Command::Monitor
-        } else {
+        } else if a.run {
             Command::Run
+        } else if a.write_manifest {
+            Command::WriteManifest
+        } else if a.install_service {
+            Command::InstallService
+        } else if a.uninstall_service {
+            Command::UninstallService
+        } else {
+            Command::Service
         }
     }
 }

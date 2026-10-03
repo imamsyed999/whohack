@@ -1,0 +1,34 @@
+[Unit]
+Description=Vigil anti-hack protection
+Documentation=https://github.com/imamsyed999/whohack
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/vigil-service --config /etc/vigil/config.toml --run
+# Watchdog: restart if the service exits for any reason.
+Restart=always
+RestartSec=5
+# Root is required for eBPF, AF_PACKET, and network blocking (cgroup + nftables).
+User=root
+Group=vigil
+RuntimeDirectory=vigil
+RuntimeDirectoryMode=0750
+StateDirectory=vigil
+LogsDirectory=vigil
+UMask=0027
+# Low CPU priority: Vigil should never compete with the user's work.
+Nice=5
+# Hardening that does not interfere with monitoring.
+NoNewPrivileges=yes
+ProtectHome=read-only
+ProtectSystem=full
+PrivateTmp=yes
+ProtectClock=yes
+ProtectHostname=yes
+LockPersonality=yes
+RestrictRealtime=yes
+
+[Install]
+WantedBy=multi-user.target
