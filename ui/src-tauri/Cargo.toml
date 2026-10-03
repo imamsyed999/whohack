@@ -1,0 +1,29 @@
+[package]
+name = "vigil-tray"
+description = "Vigil tray UI: alerts, timeline, allowlist, and mode switch"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+
+# Separate workspace: building the UI needs webview system libraries that the
+# core service build does not.
+[workspace]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-notification = "2"
+tokio = { version = "1", features = ["sync", "time", "macros", "rt"] }
+vigil-core = { path = "../../crates/vigil-core", default-features = false }
+vigil-ipc = { path = "../../crates/vigil-ipc" }
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true

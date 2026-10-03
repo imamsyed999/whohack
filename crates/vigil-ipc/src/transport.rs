@@ -122,6 +122,29 @@ pub mod windows {
     }
 }
 
+/// Any bidirectional IPC stream (Unix socket or named pipe).
+pub trait IpcStream: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin + Send {}
+impl<T: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin + Send> IpcStream for T {}
+
+/// Connects to the service endpoint on this OS.
+pub async fn connect(endpoint: &str) -> std::io::Result<Box<dyn IpcStream>> {
+    #[cfg(unix)]
+    {
+        Ok(Box::new(
+            unix::connect(std::path::Path::new(endpoint)).await?,
+        ))
+    }
+    #[cfg(windows)]
+    {
+        Ok(Box::new(windows::connect(endpoint)?))
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = endpoint;
+        Err(std::io::Error::other("unsupported OS"))
+    }
+}
+
 /// Accepts connections on `endpoint` forever, serving each on its own task.
 pub async fn run_server(
     endpoint: &str,

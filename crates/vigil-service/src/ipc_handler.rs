@@ -7,8 +7,8 @@ use std::time::Instant;
 use tokio::sync::broadcast;
 use vigil_core::store::AlertRecord;
 use vigil_core::time::now_ms;
-use vigil_core::{ResponseMode, Store};
-use vigil_ipc::{AlertSummary, Handler, PushEvent, Request, Response, StatusInfo};
+use vigil_core::{Event, EventKind, ResponseMode, Store};
+use vigil_ipc::{AlertSummary, EventSummary, Handler, PushEvent, Request, Response, StatusInfo};
 
 /// Store setting key for the runtime response-mode override.
 pub const MODE_SETTING: &str = "mode";
@@ -71,6 +71,50 @@ pub fn summarize(a: &AlertRecord) -> AlertSummary {
         action: a.verdict.action,
         explanation: a.verdict.reasons.join(" "),
         resolved: a.status == vigil_core::store::AlertStatus::Resolved,
+    }
+}
+
+/// Timeline row for an event.
+pub fn summarize_event(e: &Event) -> EventSummary {
+    let detail = match &e.kind {
+        EventKind::ProcessStart { exe, ppid, .. } => format!("{exe} (parent {ppid})"),
+        EventKind::ProcessExit => String::new(),
+        EventKind::NetConnect {
+            remote_ip,
+            remote_port,
+            proto,
+            domain,
+            ..
+        } => format!(
+            "{remote_ip}:{remote_port}/{} {}",
+            proto.as_str(),
+            domain.as_deref().unwrap_or("")
+        )
+        .trim_end()
+        .to_string(),
+        EventKind::DnsQuery { name, answers } => format!("{name} -> {} address(es)", answers.len()),
+        EventKind::FileAccess { path, class, write } => {
+            format!(
+                "{} {path} ({})",
+                if *write { "write" } else { "read" },
+                class.as_str()
+            )
+        }
+        EventKind::Persistence { location, target } => format!("{} {target}", location.as_str()),
+        EventKind::Injection { target_pid } => format!("target pid {target_pid}"),
+        EventKind::FileBurst {
+            modified,
+            renamed,
+            window_ms,
+        } => {
+            format!("{modified} modified, {renamed} renamed in {window_ms} ms")
+        }
+    };
+    EventSummary {
+        ts: e.ts,
+        pid: e.pid,
+        kind: e.kind.name().to_string(),
+        detail,
     }
 }
 
@@ -166,6 +210,12 @@ impl Handler for ServiceHandler {
                 self.with_store(|s| s.allowlist())
                     .map(|entries| Response::Allowlist { entries }),
             ),
+            Request::RecentEvents { limit } => reply(
+                self.with_store(|s| s.recent_events(limit.min(5_000)))
+                    .map(|events| Response::Events {
+                        events: events.iter().map(summarize_event).collect(),
+                    }),
+            ),
             Request::Allow { entry } => {
                 reply(self.with_store(|s| s.allow(&entry)).map(|_| Response::Ok))
             }
@@ -244,6 +294,34 @@ mod tests {
             }
         );
         assert_eq!(h.handle(Request::Disallow { entry: e }), Response::Ok);
+    }
+
+    #[test]
+    fn timeline_rows() {
+        let (h, _, _) = handler();
+        h.store
+            .lock()
+            .unwrap()
+            .insert_event(&Event {
+                ts: 5,
+                pid: 9,
+                kind: EventKind::NetConnect {
+                    remote_ip: "203.0.113.5".parse().unwrap(),
+                    remote_port: 443,
+                    proto: vigil_core::Proto::Tcp,
+                    domain: Some("example.com".into()),
+                    dns_before: true,
+                },
+            })
+            .unwrap();
+        match h.handle(Request::RecentEvents { limit: 10 }) {
+            Response::Events { events } => {
+                assert_eq!(events.len(), 1);
+                assert_eq!(events[0].kind, "net_connect");
+                assert_eq!(events[0].detail, "203.0.113.5:443/tcp example.com");
+            }
+            r => panic!("{r:?}"),
+        }
     }
 
     #[test]

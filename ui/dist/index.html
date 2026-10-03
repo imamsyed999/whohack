@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vigil</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">Vigil</div>
+    <div id="conn" class="pill pill-bad" title="Connection to the Vigil service">Connecting…</div>
+    <label class="mode">Mode
+      <select id="mode">
+        <option value="monitor">Monitor only</option>
+        <option value="prompt">Prompt (recommended)</option>
+        <option value="auto">Automatic</option>
+      </select>
+    </label>
+  </header>
+
+  <nav>
+    <button data-tab="alerts" class="active">Alerts <span id="alert-count" class="count"></span></button>
+    <button data-tab="timeline">Timeline</button>
+    <button data-tab="allowlist">Trusted</button>
+    <button data-tab="status">Status</button>
+  </nav>
+
+  <main>
+    <section id="tab-alerts" class="tab active">
+      <p id="alerts-empty" class="empty">No alerts. Vigil is watching.</p>
+      <div id="alerts"></div>
+    </section>
+
+    <section id="tab-timeline" class="tab">
+      <table>
+        <thead><tr><th>Time</th><th>PID</th><th>Event</th><th>Details</th></tr></thead>
+        <tbody id="timeline"></tbody>
+      </table>
+    </section>
+
+    <section id="tab-allowlist" class="tab">
+      <form id="allow-form">
+        <input id="allow-dest" placeholder="Trust a destination (IP, network, or domain)" required>
+        <button type="submit">Add</button>
+      </form>
+      <table>
+        <thead><tr><th>Kind</th><th>App</th><th>Value</th><th></th></tr></thead>
+        <tbody id="allowlist"></tbody>
+      </table>
+    </section>
+
+    <section id="tab-status" class="tab">
+      <dl id="status"></dl>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>

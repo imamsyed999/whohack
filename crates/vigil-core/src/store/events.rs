@@ -77,6 +77,31 @@ impl Store {
         Ok(events.len())
     }
 
+    /// The most recent events, newest first (for the UI timeline).
+    pub fn recent_events(&self, limit: u32) -> Result<Vec<Event>, StoreError> {
+        let mut stmt = self
+            .conn
+            .prepare("SELECT ts, pid, data FROM events ORDER BY ts DESC, id DESC LIMIT ?1")?;
+        let rows = stmt
+            .query_map([limit], |r| {
+                Ok((
+                    r.get::<_, i64>(0)?,
+                    r.get::<_, u32>(1)?,
+                    r.get::<_, String>(2)?,
+                ))
+            })?
+            .collect::<Result<Vec<_>, _>>()?;
+        rows.into_iter()
+            .map(|(ts, pid, data)| {
+                Ok(Event {
+                    ts,
+                    pid,
+                    kind: from_json(&data)?,
+                })
+            })
+            .collect()
+    }
+
     /// Events for `pid` at or after `since_ms`, oldest first.
     pub fn events_for_pid(&self, pid: u32, since_ms: i64) -> Result<Vec<Event>, StoreError> {
         let mut stmt = self
@@ -160,6 +185,23 @@ mod tests {
         assert_eq!(s.row_count("connections").unwrap(), 1);
         assert_eq!(s.row_count("dns").unwrap(), 2);
         assert_eq!(s.insert_events(&[]).unwrap(), 0);
+    }
+
+    #[test]
+    fn recent_events_newest_first() {
+        let s = Store::open_in_memory().unwrap();
+        for e in all_kinds(1_000, 5) {
+            s.insert_event(&e).unwrap();
+        }
+        s.insert_event(&Event {
+            ts: 2_000,
+            pid: 6,
+            kind: EventKind::ProcessExit,
+        })
+        .unwrap();
+        let r = s.recent_events(3).unwrap();
+        assert_eq!(r.len(), 3);
+        assert_eq!(r[0].pid, 6);
     }
 
     #[test]

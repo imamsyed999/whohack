@@ -39,6 +39,10 @@ pub enum Request {
         mode: ResponseMode,
     },
     ListAllowlist,
+    /// Most recent events, newest first (timeline view).
+    RecentEvents {
+        limit: u32,
+    },
     Allow {
         entry: AllowEntry,
     },
@@ -76,6 +80,7 @@ pub enum Response {
     Status { status: StatusInfo },
     Alerts { alerts: Vec<AlertSummary> },
     Allowlist { entries: Vec<AllowEntry> },
+    Events { events: Vec<EventSummary> },
     Ok,
     Error { message: String },
 }
@@ -108,6 +113,17 @@ pub struct AlertSummary {
     pub action: Action,
     pub explanation: String,
     pub resolved: bool,
+}
+
+/// One timeline row.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct EventSummary {
+    pub ts: i64,
+    pub pid: u32,
+    /// Event kind name, e.g. `net_connect`.
+    pub kind: String,
+    /// Human-readable details, e.g. `93.184.216.34:443/tcp example.com`.
+    pub detail: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

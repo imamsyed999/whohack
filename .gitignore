@@ -6,3 +6,4 @@
 /ml/.venv
 __pycache__/
 .DS_Store
+/ui/src-tauri/gen/
