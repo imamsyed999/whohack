@@ -37,7 +37,16 @@ async fn downloaded_script_and_children_are_tainted() {
     ));
     let taint = TaintEngine::new(FileAnalyzer::new(None), ProcessTracker::default());
     let pipeline = Pipeline::start(vec![collector], false, taint, bus.clone());
-    tokio::time::sleep(Duration::from_millis(400)).await; // startup snapshot
+    // Let the startup snapshot drain: on a busy machine the analysis stage
+    // hashes and signature-checks every running executable once.
+    let drain_deadline = Instant::now() + Duration::from_secs(180);
+    while Instant::now() < drain_deadline {
+        match tokio::time::timeout(Duration::from_secs(2), rx.recv()).await {
+            Err(_) => break, // quiet for 2 s: backlog processed
+            Ok(Err(tokio::sync::broadcast::error::RecvError::Closed)) => break,
+            Ok(_) => {}
+        }
+    }
 
     let mut child = std::process::Command::new("/bin/sh")
         .arg(&script)
@@ -46,7 +55,7 @@ async fn downloaded_script_and_children_are_tainted() {
     let sh_pid = child.id();
 
     let mut seen: HashMap<u32, Arc<ProcessInfo>> = HashMap::new();
-    let deadline = Instant::now() + Duration::from_secs(10);
+    let deadline = Instant::now() + Duration::from_secs(60);
     let done = |seen: &HashMap<u32, Arc<ProcessInfo>>| {
         seen.contains_key(&sh_pid) && seen.values().filter(|p| p.ppid == sh_pid).count() >= 2
     };

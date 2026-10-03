@@ -57,3 +57,7 @@ milestone expected to pick it up.
   fanotify/inotify watcher that marks new executables there as `Downloaded { url: None }`.
 - **Script working directory on Windows/macOS:** relative script paths are only resolved
   on Linux (`/proc/<pid>/cwd`). Elsewhere a script started by relative path is not detected.
+- **Startup analysis latency (M5, performance budget):** on a busy machine the startup
+  snapshot makes the analysis stage hash and signature-check hundreds of executables one
+  after another (CI showed delays of more than 10 s). Fix with a worker pool for first-sight
+  file analysis that preserves per-PID event order, plus the persistent hash cache above.
