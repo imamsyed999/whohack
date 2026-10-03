@@ -1,0 +1,330 @@
+{
+ "model": "opendecider",
+ "device": "cpu",
+ "threads": 4,
+ "dtype": "bf16",
+ "quant": "none",
+ "described": false,
+ "torch": "2.11.0+cu128",
+ "mem_before_load": {
+  "rss_mb": 473.7,
+  "peak_wset_mb": 473.7
+ },
+ "load_s": 2.15,
+ "mem_after_load": {
+  "rss_mb": 1358.6,
+  "peak_wset_mb": 1375.1
+ },
+ "tokens_malicious": {
+  "state_tokens": 216,
+  "sequence_tokens_per_question": {
+   "matches_purpose": 246,
+   "verdict": 242,
+   "tactic": 261,
+   "severity": 263,
+   "action": 252
+  },
+  "max_len": 2048
+ },
+ "tokens_benign": {
+  "state_tokens": 202,
+  "sequence_tokens_per_question": {
+   "matches_purpose": 232,
+   "verdict": 228,
+   "tactic": 247,
+   "severity": 249,
+   "action": 238
+  },
+  "max_len": 2048
+ },
+ "cases": {
+  "malicious": {
+   "raw_output": {
+    "model": "opendecider-nano",
+    "answers": {
+     "matches_purpose": {
+      "type": "noul",
+      "noul": 0.1525365114212036,
+      "probabilities": {
+       "true": 0.1525365114212036,
+       "false": 0.8474634885787964
+      },
+      "confidence": 0.8474634885787964
+     },
+     "verdict": {
+      "type": "choice",
+      "choice": "suspicious",
+      "probabilities": {
+       "benign": 0.04676514491438866,
+       "suspicious": 0.5351987481117249,
+       "malicious": 0.4180361330509186
+      },
+      "confidence": 0.5351987481117249
+     },
+     "tactic": {
+      "type": "choice",
+      "choice": "persistence",
+      "probabilities": {
+       "none": 0.039951141923666,
+       "credential_theft": 0.18874399363994598,
+       "persistence": 0.449249804019928,
+       "command_and_control": 0.12305817008018494,
+       "ransomware": 0.05010995268821716,
+       "data_exfiltration": 0.07822053134441376,
+       "reconnaissance": 0.0706663653254509
+      },
+      "confidence": 0.449249804019928
+     },
+     "severity": {
+      "type": "score",
+      "score": 3,
+      "expected": 2.4605885222554207,
+      "legend": {
+       "0": "none",
+       "1": "low",
+       "2": "high",
+       "3": "critical"
+      },
+      "probabilities": {
+       "0": 0.04114849492907524,
+       "1": 0.04662735015153885,
+       "2": 0.32271116971969604,
+       "3": 0.5895129442214966
+      },
+      "confidence": 0.5895129442214966
+     },
+     "action": {
+      "type": "choice",
+      "choice": "kill_and_quarantine",
+      "probabilities": {
+       "allow": 0.04795387014746666,
+       "ask_user": 0.19568173587322235,
+       "block_network": 0.2869482934474945,
+       "kill_and_quarantine": 0.469416081905365
+      },
+      "confidence": 0.469416081905365
+     }
+    },
+    "usage": {
+     "input_tokens": 1264,
+     "output_tokens": 0
+    },
+    "latency_ms": 2044.3
+   },
+   "full_distribution": {
+    "matches_purpose": {
+     "true": 0.1525365114212036,
+     "false": 0.8474634885787964
+    },
+    "verdict": {
+     "benign": 0.04676514491438866,
+     "suspicious": 0.5351987481117249,
+     "malicious": 0.4180361330509186
+    },
+    "tactic": {
+     "none": 0.039951141923666,
+     "credential_theft": 0.18874399363994598,
+     "persistence": 0.449249804019928,
+     "command_and_control": 0.12305817008018494,
+     "ransomware": 0.05010995268821716,
+     "data_exfiltration": 0.07822053134441376,
+     "reconnaissance": 0.0706663653254509
+    },
+    "severity": {
+     "0": 0.04114849492907524,
+     "1": 0.04662735015153885,
+     "2": 0.32271116971969604,
+     "3": 0.5895129442214966
+    },
+    "action": {
+     "allow": 0.04795387014746666,
+     "ask_user": 0.19568173587322235,
+     "block_network": 0.2869482934474945,
+     "kill_and_quarantine": 0.469416081905365
+    }
+   },
+   "raw_logits": {
+    "matches_purpose": {
+     "yes": -1.5703,
+     "no": 0.1455
+    },
+    "verdict": {
+     "benign": -2.0625,
+     "suspicious": 0.373,
+     "malicious": 0.1279
+    },
+    "tactic": {
+     "none": -1.9922,
+     "credential_theft": -0.4434,
+     "persistence": 0.4453,
+     "command_and_control": -0.8242,
+     "ransomware": -1.7812,
+     "data_exfiltration": -1.3203,
+     "reconnaissance": -1.4141
+    },
+    "severity": {
+     "0": -2.2031,
+     "1": -2.0781,
+     "2": -0.1436,
+     "3": 0.459
+    },
+    "action": {
+     "allow": -2.5625,
+     "ask_user": -1.1641,
+     "block_network": -0.7578,
+     "kill_and_quarantine": -0.2793
+    }
+   }
+  },
+  "benign": {
+   "raw_output": {
+    "model": "opendecider-nano",
+    "answers": {
+     "matches_purpose": {
+      "type": "noul",
+      "noul": 0.43638187646865845,
+      "probabilities": {
+       "true": 0.43638187646865845,
+       "false": 0.5636181235313416
+      },
+      "confidence": 0.5636181235313416
+     },
+     "verdict": {
+      "type": "choice",
+      "choice": "benign",
+      "probabilities": {
+       "benign": 0.8399085998535156,
+       "suspicious": 0.10169366002082825,
+       "malicious": 0.05839775130152702
+      },
+      "confidence": 0.8399085998535156
+     },
+     "tactic": {
+      "type": "choice",
+      "choice": "none",
+      "probabilities": {
+       "none": 0.6350494027137756,
+       "credential_theft": 0.030051767826080322,
+       "persistence": 0.07917586714029312,
+       "command_and_control": 0.04654509201645851,
+       "ransomware": 0.023041490465402603,
+       "data_exfiltration": 0.08042270690202713,
+       "reconnaissance": 0.10571365058422089
+      },
+      "confidence": 0.6350494027137756
+     },
+     "severity": {
+      "type": "score",
+      "score": 0,
+      "expected": 0.6991785503923893,
+      "legend": {
+       "0": "none",
+       "1": "low",
+       "2": "high",
+       "3": "critical"
+      },
+      "probabilities": {
+       "0": 0.4875609576702118,
+       "1": 0.3781401813030243,
+       "2": 0.08185844868421555,
+       "3": 0.05244049057364464
+      },
+      "confidence": 0.4875609576702118
+     },
+     "action": {
+      "type": "choice",
+      "choice": "allow",
+      "probabilities": {
+       "allow": 0.6553630828857422,
+       "ask_user": 0.1513158082962036,
+       "block_network": 0.12350036948919296,
+       "kill_and_quarantine": 0.06982077658176422
+      },
+      "confidence": 0.6553630828857422
+     }
+    },
+    "usage": {
+     "input_tokens": 1194,
+     "output_tokens": 0
+    },
+    "latency_ms": 1884.2
+   },
+   "full_distribution": {
+    "matches_purpose": {
+     "true": 0.43638187646865845,
+     "false": 0.5636181235313416
+    },
+    "verdict": {
+     "benign": 0.8399085998535156,
+     "suspicious": 0.10169366002082825,
+     "malicious": 0.05839775130152702
+    },
+    "tactic": {
+     "none": 0.6350494027137756,
+     "credential_theft": 0.030051767826080322,
+     "persistence": 0.07917586714029312,
+     "command_and_control": 0.04654509201645851,
+     "ransomware": 0.023041490465402603,
+     "data_exfiltration": 0.08042270690202713,
+     "reconnaissance": 0.10571365058422089
+    },
+    "severity": {
+     "0": 0.4875609576702118,
+     "1": 0.3781401813030243,
+     "2": 0.08185844868421555,
+     "3": 0.05244049057364464
+    },
+    "action": {
+     "allow": 0.6553630828857422,
+     "ask_user": 0.1513158082962036,
+     "block_network": 0.12350036948919296,
+     "kill_and_quarantine": 0.06982077658176422
+    }
+   },
+   "raw_logits": {
+    "matches_purpose": {
+     "yes": -0.3984,
+     "no": -0.1309
+    },
+    "verdict": {
+     "benign": 0.3301,
+     "suspicious": -1.7734,
+     "malicious": -2.3281
+    },
+    "tactic": {
+     "none": 0.4082,
+     "credential_theft": -2.6406,
+     "persistence": -1.6641,
+     "command_and_control": -2.1875,
+     "ransomware": -2.9062,
+     "data_exfiltration": -1.6641,
+     "reconnaissance": -1.4062
+    },
+    "severity": {
+     "0": 0.0422,
+     "1": -0.2119,
+     "2": -1.7422,
+     "3": -2.1875
+    },
+    "action": {
+     "allow": -0.249,
+     "ask_user": -1.7266,
+     "block_network": -1.9375,
+     "kill_and_quarantine": -2.5
+    }
+   }
+  }
+ },
+ "latency_ms_5q": {
+  "runs": 20,
+  "p50": 2020.1,
+  "p95": 2068.4,
+  "mean": 2026.9,
+  "min": 2009.8,
+  "max": 2072.5
+ },
+ "mem_after_runs": {
+  "rss_mb": 1462.3,
+  "peak_wset_mb": 1473.6
+ }
+}

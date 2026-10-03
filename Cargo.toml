@@ -1,0 +1,63 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+vigil-core = { path = "crates/vigil-core", default-features = false }
+vigil-collect = { path = "crates/vigil-collect" }
+vigil-ebpf-common = { path = "crates/vigil-ebpf-common" }
+vigil-intel = { path = "crates/vigil-intel" }
+vigil-taint = { path = "crates/vigil-taint" }
+vigil-ipc = { path = "crates/vigil-ipc" }
+vigil-decide = { path = "crates/vigil-decide" }
+
+anyhow = "1.0.104"
+async-trait = "0.1.92"
+aya = { version = "0.14.0", default-features = false }
+ferrisetw = "1.2.0"
+libc = "0.2"
+lru = "0.18.5"
+md-5 = "0.11.0"
+rand = "0.9"
+clap = { version = "4.6.7", features = ["derive"] }
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+tempfile = "3.27.0"
+thiserror = "2.0.21"
+tokio = { version = "1.53.1", features = ["sync", "rt", "rt-multi-thread", "macros", "time", "net", "signal"] }
+toml = "1.1.6"
+tracing = "0.1.44"
+tracing-appender = "0.2.5"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
+windows-sys = "0.61.2"
+yara-x = { version = "1.21.0", default-features = false, features = [
+    "constant-folding",
+    "exact-atoms",
+    "fast-regexp",
+    "console-module",
+    "dotnet-module",
+    "elf-module",
+    "hash-module",
+    "macho-module",
+    "math-module",
+    "pe-module",
+    "string-module",
+    "time-module",
+] }
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"

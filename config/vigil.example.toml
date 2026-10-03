@@ -1,0 +1,78 @@
+# Vigil service configuration (example).
+#
+# Default location:
+#   Windows  %ProgramData%\Vigil\config.toml
+#   Linux    /etc/vigil/config.toml
+#   macOS    /Library/Application Support/Vigil/config.toml
+#
+# Every key is optional; omitted keys use the defaults shown here. Unknown keys
+# are rejected, so a typo is reported instead of silently ignored. Relative
+# paths are resolved against the directory containing this file.
+#
+# `vigil-service --print-default-config` prints the defaults for your OS;
+# `vigil-service --config FILE --check-config` validates a file.
+
+# Response mode:
+#   monitor  log and notify only
+#   prompt   block network on suspicion, ask before anything stronger (default)
+#   auto     apply the strongest policy action automatically, notify after
+mode = "prompt"
+
+[paths]
+# Where the event database and other state live.
+# Defaults: Windows %ProgramData%\Vigil\data, Linux /var/lib/vigil,
+#           macOS /Library/Application Support/Vigil/data
+data_dir = "data"
+# Defaults: Windows %ProgramData%\Vigil\logs, Linux /var/log/vigil,
+#           macOS /Library/Logs/Vigil
+log_dir = "logs"
+# Detection content: yara/*.yar, Tier 0 rules, behavior profiles.
+# Defaults: Windows %ProgramData%\Vigil\rules, Linux /etc/vigil/rules,
+#           macOS /Library/Application Support/Vigil/rules
+rules_dir = "rules"
+
+[storage]
+# SQLite database file, relative to data_dir (or absolute).
+db_file = "vigil.db"
+# How long raw events, connections and DNS records are kept (1-3650 days).
+event_retention_days = 30
+
+[logging]
+# A tracing filter directive, e.g. "info" or "info,vigil_core=debug".
+# The RUST_LOG environment variable overrides this at runtime.
+level = "info"
+# text | json
+format = "text"
+# Also write a daily-rolling log file in log_dir.
+to_file = true
+
+[collect]
+# auto   native sources (eBPF on Linux, ETW on Windows) when privileged, else polling
+# poll   polling only (works unprivileged; may miss very short-lived activity)
+# native native only; the service refuses to start if unavailable
+backend = "auto"
+# Polling interval for polling collectors (100-60000 ms).
+poll_interval_ms = 1000
+# Report connections to 127.0.0.0/8 and ::1 (normally noise).
+include_loopback = false
+# Watch DNS answers so connections can be attributed to domain names.
+dns = true
+
+[sensitive]
+# Extra locations on top of the built-in per-OS table (browser credential stores,
+# ~/.ssh, keychains, wallets, persistence locations). A path may be a directory
+# (covers its contents) or a file.
+# Classes: browser_passwords, keychain, ssh_keys, crypto_wallet, documents, other
+[sensitive.extra_paths]
+# browser_passwords = ["/srv/shared-profiles"]
+# Kinds: run_key, startup_folder, scheduled_task, service, launch_agent,
+#        login_item, cron, systemd_unit, shell_rc, autostart
+[sensitive.extra_persistence]
+# autostart = ["/etc/xdg/autostart"]
+
+[ipc]
+# Local endpoint the tray UI connects to (authenticated with a per-session token
+# written to <data_dir>/ipc.token).
+# Defaults: Linux /run/vigil/vigil.sock, macOS /var/run/vigil/vigil.sock,
+#           Windows \\.\pipe\vigil
+# endpoint = "/run/vigil/vigil.sock"

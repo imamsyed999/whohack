@@ -1,0 +1,21 @@
+[package]
+name = "vigil-decide"
+description = "Vigil typed-decision model integration: DecisionModel trait, sidecar client, mock model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tracing.workspace = true
+vigil-core.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

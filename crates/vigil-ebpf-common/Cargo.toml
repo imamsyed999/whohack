@@ -1,0 +1,10 @@
+[package]
+name = "vigil-ebpf-common"
+description = "Types shared between Vigil's eBPF programs and the userspace collector"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

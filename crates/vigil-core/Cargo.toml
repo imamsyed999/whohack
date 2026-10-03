@@ -1,0 +1,27 @@
+[package]
+name = "vigil-core"
+description = "Vigil core types, configuration, event bus, and SQLite event store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+default = ["store"]
+# SQLite event store. Off for crates that only need the types (collectors, tags, ...).
+store = ["dep:rusqlite"]
+
+[dependencies]
+rusqlite = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+toml.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

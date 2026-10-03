@@ -1,0 +1,80 @@
+{
+ "model": "laya",
+ "graph": "laya.int8.onnx",
+ "file_mb": 568.9,
+ "threads": 4,
+ "load_s": 5.41,
+ "rss_after_load_mb": 1212.2,
+ "rss_after_runs_mb": 1486.7,
+ "peak_wset_mb": 2004.7,
+ "latency_ms_5q": {
+  "p50": 1078.7,
+  "p95": 1099.4
+ },
+ "full_distribution": {
+  "malicious": {
+   "matches_purpose": {
+    "true": 0.5504,
+    "false": 0.4496
+   },
+   "verdict": {
+    "benign": 0.1884,
+    "suspicious": 0.4014,
+    "malicious": 0.4103
+   },
+   "tactic": {
+    "none": 0.0778,
+    "credential_theft": 0.1545,
+    "persistence": 0.1915,
+    "command_and_control": 0.1247,
+    "ransomware": 0.164,
+    "data_exfiltration": 0.1419,
+    "reconnaissance": 0.1455
+   },
+   "severity": {
+    "0": 0.1927,
+    "1": 0.2407,
+    "2": 0.3559,
+    "3": 0.2108
+   },
+   "action": {
+    "allow": 0.2776,
+    "ask_user": 0.2302,
+    "block_network": 0.2371,
+    "kill_and_quarantine": 0.2551
+   }
+  },
+  "benign": {
+   "matches_purpose": {
+    "true": 0.4562,
+    "false": 0.5438
+   },
+   "verdict": {
+    "benign": 0.3016,
+    "suspicious": 0.3202,
+    "malicious": 0.3782
+   },
+   "tactic": {
+    "none": 0.1403,
+    "credential_theft": 0.1495,
+    "persistence": 0.1537,
+    "command_and_control": 0.1552,
+    "ransomware": 0.1607,
+    "data_exfiltration": 0.1314,
+    "reconnaissance": 0.1092
+   },
+   "severity": {
+    "0": 0.4579,
+    "1": 0.2842,
+    "2": 0.1575,
+    "3": 0.1004
+   },
+   "action": {
+    "allow": 0.303,
+    "ask_user": 0.2515,
+    "block_network": 0.2142,
+    "kill_and_quarantine": 0.2313
+   }
+  }
+ }
+}

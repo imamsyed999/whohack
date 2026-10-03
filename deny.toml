@@ -1,0 +1,52 @@
+# cargo-deny configuration: https://embarkstudios.github.io/cargo-deny/
+#
+# Project policy (SPEC §4): permissive licenses only. Unicode-3.0 (required by
+# `unicode-ident`) and Zlib (`foldhash`) are permissive and approved.
+# "Apache-2.0 WITH LLVM-exception" (wasmtime/cranelift, via yara-x) is
+# Apache-2.0 plus an additional permission, so it is within policy.
+# Anything else fails CI and needs explicit maintainer approval.
+
+[licenses]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "Apache-2.0 WITH LLVM-exception",
+]
+confidence-threshold = 0.9
+unused-allowed-license = "allow"
+
+[advisories]
+yanked = "deny"
+# Each ignore is reviewed and tracked in docs/backlog.md; remove when fixed upstream.
+ignore = [
+    # bincode 2 is unmaintained (pulled in by yara-x for rule serialization); informational only.
+    { id = "RUSTSEC-2025-0141", reason = "unmaintained notice; used only by yara-x internals" },
+    # rsa timing side channel affects private-key operations; yara-x only verifies
+    # Authenticode signatures with public keys, so Vigil is not exposed.
+    { id = "RUSTSEC-2023-0071", reason = "no private-key operations performed" },
+    # wasmtime type-index confusion across multiple Engines (CVSS 3.8). Vigil runs a single
+    # yara-x rule set (one engine). No yara-x release yet uses a patched wasmtime (>= 46.0.2).
+    { id = "RUSTSEC-2026-0222", reason = "single engine; awaiting yara-x wasmtime bump" },
+    # The following wasmtime advisories concern WASI filesystem sandboxing, the
+    # component model, and hostcall fuel accounting. yara-x compiles *trusted*
+    # rule sources to core wasm and never loads untrusted wasm modules, WASI, or
+    # components, so these code paths are not reachable from Vigil.
+    { id = "RUSTSEC-2026-0269", reason = "WASI filesystem not used by yara-x" },
+    { id = "RUSTSEC-2026-0316", reason = "component model not used by yara-x" },
+    { id = "RUSTSEC-2026-0327", reason = "component model async not used by yara-x" },
+]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+# Workspace path dependencies (publish = false) are not wildcards in practice.
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

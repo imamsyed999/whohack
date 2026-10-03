@@ -1,0 +1,47 @@
+[package]
+name = "vigil-collect"
+description = "Vigil collectors: per-OS process, network, and DNS event sources"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+# Linux eBPF backend (tracepoints). Building it needs a nightly toolchain with
+# rust-src and `bpf-linker` on PATH; see docs/building.md.
+ebpf = ["dep:aya", "dep:vigil-ebpf-common"]
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+vigil-core.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
+aya = { workspace = true, optional = true }
+libc.workspace = true
+vigil-ebpf-common = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+libc.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+ferrisetw.workspace = true
+windows-sys = { workspace = true, features = [
+    "Wdk_System_Threading",
+    "Win32_Foundation",
+    "Win32_NetworkManagement_IpHelper",
+    "Win32_Networking_WinSock",
+    "Win32_Security",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_Kernel",
+    "Win32_System_Threading",
+] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

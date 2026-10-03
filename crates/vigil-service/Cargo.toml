@@ -1,0 +1,31 @@
+[package]
+name = "vigil-service"
+description = "Vigil core service: wires collectors, detection, and response"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+# Linux eBPF collector (needs nightly + rust-src + bpf-linker; see docs/building.md).
+ebpf = ["vigil-collect/ebpf"]
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-appender.workspace = true
+tracing-subscriber.workspace = true
+vigil-core = { workspace = true, features = ["store"] }
+vigil-collect.workspace = true
+vigil-intel.workspace = true
+vigil-ipc.workspace = true
+vigil-taint.workspace = true
+
+[dev-dependencies]
+async-trait.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

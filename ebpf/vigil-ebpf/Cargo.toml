@@ -1,0 +1,28 @@
+[package]
+name = "vigil-ebpf"
+description = "Vigil eBPF tracepoint programs (built for bpfel-unknown-none by aya-build)"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+
+# Standalone workspace: this crate targets bpfel-unknown-none with a nightly
+# toolchain and must not be built as part of the main (host) workspace.
+[workspace]
+
+[dependencies]
+aya-ebpf = { version = "0.2.1", default-features = false }
+vigil-ebpf-common = { path = "../../crates/vigil-ebpf-common" }
+
+[[bin]]
+name = "vigil-ebpf"
+path = "src/main.rs"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+debug = 2
+codegen-units = 1
+strip = false
