@@ -1,0 +1,24 @@
+[package]
+name = "whohack-detect"
+description = "whohack deterministic detection rules and untrained behavior scoring"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+tract-onnx.workspace = true
+lru.workspace = true
+sha2.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde-saphyr.workspace = true
+whohack-core.workspace = true
+whohack-tags.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

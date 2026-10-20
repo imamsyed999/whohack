@@ -4092,8 +4092,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
-name = "vigil-core"
-version = "0.1.0"
+name = "whohack-core"
+version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -4104,8 +4104,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "vigil-ipc"
-version = "0.1.0"
+name = "whohack-ipc"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "libc",
@@ -4115,13 +4115,13 @@ dependencies = [
  "thiserror 2.0.21",
  "tokio",
  "tracing",
- "vigil-core",
+ "whohack-core",
  "windows-sys 0.61.2",
 ]
 
 [[package]]
-name = "vigil-tray"
-version = "0.1.0"
+name = "whohack-tray"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "serde",
@@ -4130,8 +4130,8 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-notification",
  "tokio",
- "vigil-core",
- "vigil-ipc",
+ "whohack-core",
+ "whohack-ipc",
 ]
 
 [[package]]

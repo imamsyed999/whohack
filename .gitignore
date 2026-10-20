@@ -1,4 +1,10 @@
 /target
+/ui/src-tauri/target/
+/.vigil/
+/whohack.local.toml
+/vigil.local.toml
+/beacon-replay.jsonl
+/rules/MANIFEST.sha256
 *.db
 *.db-wal
 *.db-shm

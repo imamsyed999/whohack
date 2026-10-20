@@ -1,0 +1,12 @@
+category: media_player
+expected:
+  - "file:read_documents"
+  - "file:write_own_dir"
+  - "network:vendor_domain"
+  - "network:known_cdn"
+never:
+  - "defense_evasion:*"
+  - "impact:*"
+  - "injection:*"
+  - "credential_access:*"
+

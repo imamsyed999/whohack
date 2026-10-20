@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vigil</title>
+  <title>whohack</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <div class="brand">Vigil</div>
-    <div id="conn" class="pill pill-bad" title="Connection to the Vigil service">Connecting…</div>
+    <div class="brand">whohack</div>
+    <div id="conn" class="pill pill-bad" title="Connection to the whohack service">Connecting…</div>
     <label class="mode">Mode
       <select id="mode">
         <option value="monitor">Monitor only</option>
-        <option value="prompt">Prompt (recommended)</option>
-        <option value="auto">Automatic</option>
+        <option value="prompt" disabled>Prompt before stronger actions</option>
+        <option value="auto" disabled>Automatic response</option>
       </select>
     </label>
   </header>
@@ -23,12 +23,15 @@
     <button data-tab="alerts" class="active">Alerts <span id="alert-count" class="count"></span></button>
     <button data-tab="timeline">Timeline</button>
     <button data-tab="allowlist">Trusted</button>
+    <button data-tab="profiles">App profiles</button>
+    <button data-tab="responses">Responses &amp; quarantine</button>
     <button data-tab="status">Status</button>
   </nav>
 
   <main>
     <section id="tab-alerts" class="tab active">
-      <p id="alerts-empty" class="empty">No alerts. Vigil is watching.</p>
+      <p id="response-mode-note" class="empty">whohack records activity and raises alerts.</p>
+      <p id="alerts-empty" class="empty">No recorded alerts.</p>
       <div id="alerts"></div>
     </section>
 
@@ -52,6 +55,21 @@
 
     <section id="tab-status" class="tab">
       <dl id="status"></dl>
+    </section>
+
+    <section id="tab-responses" class="tab">
+      <p class="empty">Review actions taken by whohack. Releasing a block or suspension restores access. Restoring a quarantined file never runs it.</p>
+      <div id="responses"></div>
+      <h2>Quarantined files</h2>
+      <div id="quarantine"></div>
+    </section>
+
+    <section id="tab-profiles" class="tab">
+      <p class="empty">Choose each app's category to compare its observed behavior. Observed behavior is never automatically trusted.</p>
+      <table>
+        <thead><tr><th>App</th><th>Category</th><th>Observed capabilities</th></tr></thead>
+        <tbody id="profiles"></tbody>
+      </table>
     </section>
   </main>
 

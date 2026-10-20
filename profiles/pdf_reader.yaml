@@ -1,0 +1,14 @@
+category: pdf_reader
+expected:
+  - "file:read_documents"
+  - "file:write_own_dir"
+  - "network:vendor_domain"
+  - "network:known_cdn"
+never:
+  - "credential_access:*"
+  - "injection:*"
+  - "persistence:run_key"
+  - "exec:script_interpreter"
+  - "impact:*"
+  - "defense_evasion:*"
+

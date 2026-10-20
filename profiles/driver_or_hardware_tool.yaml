@@ -1,0 +1,13 @@
+category: driver_or_hardware_tool
+expected:
+  - "file:read_documents"
+  - "file:write_own_dir"
+  - "network:vendor_domain"
+  - "network:known_cdn"
+  - "discovery:system_info"
+never:
+  - "defense_evasion:*"
+  - "impact:*"
+  - "injection:*"
+  - "credential_access:*"
+

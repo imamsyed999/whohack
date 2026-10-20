@@ -1,0 +1,42 @@
+[package]
+name = "whohack-service"
+description = "whohack core service: wires collectors, detection, and response"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[features]
+# Linux eBPF collector (needs nightly + rust-src + bpf-linker; see docs/building.md).
+ebpf = ["whohack-collect/ebpf"]
+
+[dependencies]
+anyhow.workspace = true
+sha2.workspace = true
+clap.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-appender.workspace = true
+tracing-subscriber.workspace = true
+whohack-core = { workspace = true, features = ["store"] }
+whohack-collect.workspace = true
+whohack-intel.workspace = true
+whohack-ipc.workspace = true
+whohack-taint.workspace = true
+whohack-tags.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+whohack-detect.workspace = true
+whohack-decide.workspace = true
+whohack-respond.workspace = true
+lru.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-service.workspace = true
+
+[dev-dependencies]
+async-trait.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

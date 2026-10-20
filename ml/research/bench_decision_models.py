@@ -1,4 +1,4 @@
-"""Run and benchmark the two Tier-2 candidate decision models on Vigil's cases.
+"""Run and benchmark the two Tier-2 candidate decision models on whohack's cases.
 
 Usage (from repo root, inside ml/.venv):
     python ml/research/bench_decision_models.py --model laya --device cpu --threads 4
@@ -49,7 +49,7 @@ import numpy as np  # noqa: E402
 import psutil  # noqa: E402
 import torch  # noqa: E402
 
-import vigil_cases as vc  # noqa: E402
+import whohack_cases as vc  # noqa: E402
 
 PROC = psutil.Process()
 

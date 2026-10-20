@@ -1,0 +1,39 @@
+[Unit]
+Description=whohack monitoring preview
+Documentation=https://github.com/imamsyed999/whohack
+After=local-fs.target
+
+[Service]
+Type=simple
+User=whohack-preview
+Group=whohack-preview
+ExecStart=/usr/bin/whohack-service --config /etc/whohack-preview/config.toml --run
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+RuntimeDirectory=whohack-preview
+RuntimeDirectoryMode=0750
+StateDirectory=whohack-preview
+StateDirectoryMode=0750
+LogsDirectory=whohack-preview
+LogsDirectoryMode=0750
+UMask=0027
+Nice=5
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

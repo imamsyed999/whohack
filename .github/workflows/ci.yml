@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,6 +41,15 @@ jobs:
             python3 tools/ci/annotate_test_failures.py test.log || python tools/ci/annotate_test_failures.py test.log
           fi
           exit "$status"
+      - name: Harmless simulator
+        run: python tools/beacon-sim/test_beacon_sim.py
+      - name: Local ML and feed tooling
+        run: |
+          python tools/ci/check_wasmtime_surface.py
+          python -m unittest discover -s ml -p 'test_*.py'
+          python tools/ml/test_prepare_model.py
+          python tools/intel/test_update.py
+          python tools/intel/test_virustotal.py
 
   linux-ebpf:
     name: linux eBPF (live, root)
@@ -60,12 +70,31 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - uses: Swatinem/rust-cache@v2
       - name: Clippy (ebpf feature)
-        run: cargo clippy -p vigil-collect --features ebpf --all-targets --locked -- -D warnings
+        run: cargo clippy -p whohack-collect --features ebpf --all-targets --locked -- -D warnings
       - name: Live eBPF + DNS tests as root
         run: >-
           sudo -E env "PATH=$PATH" "HOME=$HOME"
           "RUSTUP_HOME=${RUSTUP_HOME:-$HOME/.rustup}" "CARGO_HOME=${CARGO_HOME:-$HOME/.cargo}"
-          cargo test -p vigil-collect --features ebpf --locked -- --include-ignored
+          cargo test -p whohack-collect --features ebpf --locked -- --include-ignored
+      - name: Prepare isolated Linux response acceptance
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nftables iproute2
+          cargo test -p whohack-respond --locked --no-run --message-format=json > response-tests.json
+          python3 - <<'PY'
+          import json, os, pathlib
+          records = [json.loads(line) for line in pathlib.Path('response-tests.json').read_text().splitlines()]
+          tests = [r['executable'] for r in records if r.get('reason') == 'compiler-artifact'
+                   and r.get('profile', {}).get('test') and r['target']['name'] == 'whohack_respond'
+                   and r.get('executable')]
+          assert len(tests) == 1
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('WHOHACK_RESPONSE_TEST=' + tests[0] + '\n')
+          PY
+      - name: Block/release and recovery in private network namespaces
+        run: |
+          sudo python3 tools/linux/test_response.py "$WHOHACK_RESPONSE_TEST"
+          sudo python3 tools/linux/test_response.py "$WHOHACK_RESPONSE_TEST" --recovery-only
 
   tray-ui:
     name: tray UI (${{ matrix.os }})
@@ -94,13 +123,121 @@ jobs:
       - name: Format
         run: cargo fmt --check
       - name: Clippy
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets --locked -- -D warnings
       - name: Build
-        run: cargo build
+        run: cargo build --locked
+      - name: Build Windows service
+        if: runner.os == 'Windows'
+        working-directory: .
+        run: cargo build -p whohack-service -p whohack-launcher -p whohack-response-helper --locked
+      - name: Windows runtime smoke test
+        if: runner.os == 'Windows'
+        working-directory: .
+        run: python tools/windows/smoke_test.py
+      - name: Package Windows preview
+        if: runner.os == 'Windows'
+        working-directory: .
+        run: |
+          New-Item -ItemType Directory -Force .vigil/checks | Out-Null
+          cargo metadata --format-version 1 --locked --filter-platform x86_64-pc-windows-msvc | Out-File -Encoding utf8 .vigil/checks/core-metadata.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo metadata --manifest-path ui/src-tauri/Cargo.toml --format-version 1 --locked --filter-platform x86_64-pc-windows-msvc | Out-File -Encoding utf8 .vigil/checks/ui-metadata.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/windows/notices.py --metadata .vigil/checks/core-metadata.json --metadata .vigil/checks/ui-metadata.json --upstream-cache .vigil/checks/license-cache --output .vigil/packages/THIRD-PARTY-NOTICES.txt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/windows/package.py
+      - name: Extracted Windows package smoke test
+        if: runner.os == 'Windows'
+        working-directory: .
+        run: python tools/windows/test_package.py
+      - uses: actions/setup-node@v6
+        if: runner.os == 'Windows'
+        with:
+          node-version: '24'
+      - name: Real Windows WebView2 UI acceptance
+        if: runner.os == 'Windows'
+        working-directory: .
+        run: python tools/windows/test_ui.py
+      - uses: actions/setup-python@v6
+        if: runner.os == 'Windows'
+        with:
+          python-version: '3.11'
+      - name: Build unsigned per-user Windows installer
+        if: runner.os == 'Windows'
+        working-directory: .
+        run: python tools/windows/build_msi.py
+      - name: Windows per-user installer acceptance
+        if: runner.os == 'Windows'
+        working-directory: .
+        run: python tools/windows/test_msi.py
+      - name: Upload Windows preview artifacts
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v7
+        with:
+          name: whohack-Windows-Preview
+          path: |
+            .vigil/packages/whohack-Windows-Preview.zip
+            .vigil/packages/whohack-Windows-Preview.zip.sha256
+            .vigil/packages/whohack-Windows-Preview.msi
+            .vigil/packages/whohack-Windows-Preview.msi.sha256
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  linux-packages:
+    name: Linux deb/rpm preview lifecycle
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build native service and attribution
+        run: |
+          cargo build -p whohack-service --release --locked --jobs 2
+          mkdir -p .vigil/checks .vigil/packages/linux
+          cargo metadata --format-version 1 --locked --filter-platform x86_64-unknown-linux-gnu > .vigil/checks/linux-metadata.json
+          python3 tools/windows/notices.py --target x86_64-unknown-linux-gnu --metadata .vigil/checks/linux-metadata.json --upstream-cache .vigil/checks/license-cache --output .vigil/packages/linux/THIRD-PARTY-NOTICES.txt
+      - name: Prepare disposable package environments
+        run: |
+          docker build -t whohack-package-tools -f packaging/linux/preview/Dockerfile .
+          docker build -t whohack-rpm-test -f packaging/linux/preview/Dockerfile.fedora .
+      - name: Build packages offline
+        run: >-
+          docker run --rm --network none --cpus 2 --memory 2g
+          --mount "type=bind,source=$PWD,target=/src,readonly"
+          --mount "type=bind,source=$PWD/target/release/whohack-service,target=/build/whohack-service,readonly"
+          --mount "type=bind,source=$PWD/.vigil/packages/linux,target=/out"
+          whohack-package-tools python3 /src/tools/linux/package.py
+          --service /build/whohack-service --notices /out/THIRD-PARTY-NOTICES.txt --output /out
+      - name: Test installation, native runtime, reinstall and removal
+        run: |
+          for entry in 'whohack-package-tools *.deb' 'whohack-rpm-test *.rpm'; do
+            read -r image pattern <<< "$entry"
+            for package in .vigil/packages/linux/$pattern; do
+              docker run --rm --network none --cpus 2 --memory 1g \
+                --env WHOHACK_PACKAGE_CONTAINER_TEST=1 \
+                --mount "type=bind,source=$PWD/.vigil/packages/linux,target=/artifacts,readonly" \
+                --mount "type=bind,source=$PWD/tools/linux/test_package.py,target=/test.py,readonly" \
+                "$image" python3 /test.py "/artifacts/$(basename "$package")"
+            done
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: whohack-Linux-Preview
+          path: .vigil/packages/linux/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
 
   deny:
-    name: licenses & advisories
+    name: licenses & advisories (${{ matrix.manifest }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        manifest: [Cargo.toml, ui/src-tauri/Cargo.toml]
     steps:
       - uses: actions/checkout@v5
       - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: ${{ matrix.manifest }}

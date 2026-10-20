@@ -1,15 +1,15 @@
-//! Connection to the Vigil service over authenticated local IPC.
+//! Connection to the whohack service over authenticated local IPC.
 //!
 //! The endpoint and token location come from the service's config file
-//! (`VIGIL_CONFIG` or the per-OS default); the token is re-read on every
+//! (`WHOHACK_CONFIG` or the per-OS default); the token is re-read on every
 //! connect because the service generates a new one each time it starts.
 
 use std::path::PathBuf;
 
 use tokio::sync::Mutex;
-use vigil_core::Config;
-use vigil_ipc::transport::{IpcStream, connect};
-use vigil_ipc::{Client, Request, Response};
+use whohack_core::Config;
+use whohack_ipc::transport::{IpcStream, connect};
+use whohack_ipc::{Client, Request, Response};
 
 pub type IpcClient = Client<Box<dyn IpcStream>>;
 
@@ -21,7 +21,8 @@ pub struct Settings {
 
 impl Settings {
     pub fn load() -> Self {
-        let path = std::env::var_os("VIGIL_CONFIG")
+        let path = std::env::var_os("WHOHACK_CONFIG")
+            .or_else(|| std::env::var_os("VIGIL_CONFIG"))
             .map(PathBuf::from)
             .unwrap_or_else(Config::default_path);
         let cfg = Config::load(&path).unwrap_or_else(|_| Config::default_for_os());
@@ -32,15 +33,15 @@ impl Settings {
     }
 
     pub async fn open(&self) -> Result<IpcClient, String> {
-        let token = vigil_ipc::auth::read_token_file(&self.token_file).map_err(|e| {
+        let token = whohack_ipc::auth::read_token_file(&self.token_file).map_err(|e| {
             format!(
-                "cannot read {}: {e} (is the Vigil service running?)",
+                "cannot read {}: {e} (is the whohack service running?)",
                 self.token_file.display()
             )
         })?;
         let stream = connect(&self.endpoint).await.map_err(|e| {
             format!(
-                "cannot connect to {}: {e} (is the Vigil service running?)",
+                "cannot connect to {}: {e} (is the whohack service running?)",
                 self.endpoint
             )
         })?;

@@ -1,0 +1,15 @@
+category: vpn_or_network_tool
+expected:
+  - "file:read_documents"
+  - "file:write_own_dir"
+  - "network:vendor_domain"
+  - "network:known_cdn"
+  - "network:first_seen_destination"
+  - "network:unusual_port"
+  - "network:raw_ip_no_dns"
+never:
+  - "defense_evasion:*"
+  - "impact:*"
+  - "injection:*"
+  - "credential_access:*"
+

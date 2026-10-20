@@ -1,0 +1,130 @@
+[
+  {
+    "path": "datasets/malware/agent_tesla/agent_tesla_ftp/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:e34b4663372fc5456336052615813f0d0bdb2572d7eed9a326acec45c186c016\nsize 11691422\n"
+  },
+  {
+    "path": "datasets/malware/amadey/access_permission/amadey_sysmon2.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:1e11d6c9114dab7560e603249b74e6c71ccd6b1855c8e4f4e271f8efdce6dce6\nsize 98786\n"
+  },
+  {
+    "path": "datasets/malware/azorult/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:00b51f8b994ee390d7305f35b43fd2a92570d41261576ebd548d5e9c5b187429\nsize 52036939\n"
+  },
+  {
+    "path": "datasets/malware/brute_ratel/brute_duplicate_token/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:9b3b95129e5798f2f5d77fdb316ea3f1d19298d29ba6c7ada245a6512ccb2d17\nsize 22067671\n"
+  },
+  {
+    "path": "datasets/malware/chaos_ransomware/spread_in_root_drives/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:e12d3fc9ababe97039a5c027170b19e68242aa0cbee867ac8f9d9f22b34b73a9\nsize 45456905\n"
+  },
+  {
+    "path": "datasets/malware/clop/clop_a/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:b765f9864bd642603dc8a7a4bd3c23e5b036e4ebed9d2f0ac0716f69870996d3\nsize 79224673\n"
+  },
+  {
+    "path": "datasets/malware/conti/conti-cobalt/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:a33c7bc9ec170e7fbf907a0f6197529f5c37a5c5193b7707325f7e5ce42fd9d5\nsize 37310459\n"
+  },
+  {
+    "path": "datasets/malware/dcrat/dcrat_delay_execution/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:5b0ef47a054421cfb1628485f145640362ed51ff85754abea13a75966689e54f\nsize 3111533\n"
+  },
+  {
+    "path": "datasets/malware/doublezero_wiper/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:1bd8899303f5fca2f3d99f310ee27e0e670d89a5643c06805558353c3190b522\nsize 18964977\n"
+  },
+  {
+    "path": "datasets/malware/fin7/fin7_js_2/ldap_module_loaded_sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:00eda0add67ea969fb91b56df0405e083aa1e755ff4bab90f7a259d25612b689\nsize 4518\n"
+  },
+  {
+    "path": "datasets/malware/gootloader/partial_ttps/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:8264e3fa99527d694905bf7c9921cb2b18d15d152f6c959a902af65b8a4d2d79\nsize 22927\n"
+  },
+  {
+    "path": "datasets/malware/hermetic_wiper/globalfolderoptions_reg/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:d46cd328c9aaa82a9df797ca56d037a8c19572f90a0c9cb6b0a37c5f6c834034\nsize 6298056\n"
+  },
+  {
+    "path": "datasets/malware/icedid/cmd_carry_str_param/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:6cec51c32bef2dc0eca57ca619a2e7017c43dcad88658adb588dedf5676abbbb\nsize 3292157\n"
+  },
+  {
+    "path": "datasets/malware/industroyer2/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:55368573e681f2e980f93ccd22d10a6e437f89854b3f6bddbae8992bd37b6c98\nsize 13670633\n"
+  },
+  {
+    "path": "datasets/malware/lockbit_ransomware/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:7b8265b968d100892fa3ed597c099dd772425e7f16d4ffe66a0cfed12f2d40bd\nsize 16706353\n"
+  },
+  {
+    "path": "datasets/malware/minergate/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:0856c2b0ed029c0e657fc3c958922ae391a03a657cafa8f23be1ff0c516d0255\nsize 477061074\n"
+  },
+  {
+    "path": "datasets/malware/notdoor/disable_dialogs/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:cc9a6bb62770ced26341092729f79f256b5a1a16d85b3fea2dd5c992fc0d190f\nsize 3633\n"
+  },
+  {
+    "path": "datasets/malware/olympic_destroyer/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:fbaca21ff9c39e47586cf3755aa5013cbe044cc00164fb7b7fb47a592c3d6111\nsize 42480765\n"
+  },
+  {
+    "path": "datasets/malware/prestige_ransomware/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:ae83b90c36ecb96cd81c449d225962f36ca4771a3c8a518ebd63fe4988a0dd86\nsize 24024557\n"
+  },
+  {
+    "path": "datasets/malware/qakbot/qbot2/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:3560a6e9c5f844f432c7fafd6335290508db3ca8f74033e554f47873e70d4d0c\nsize 27039519\n"
+  },
+  {
+    "path": "datasets/malware/ransomware_ttp/data1/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:548f05534f85969127ed4c3cb8aed82f0a87a97cac841f4ffb248c530b29c638\nsize 61417025\n"
+  },
+  {
+    "path": "datasets/malware/redline/modify_registry/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:91fa46d649011ce4ff9d814eec5bcee0f90da878d0967dce7d915b784f53d51a\nsize 8845034\n"
+  },
+  {
+    "path": "datasets/malware/remcos/remcos/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:89cdffee4d988a574e15af98bcbb36f5c099c71ea6be536b6cab9d54616e6982\nsize 20316493\n"
+  },
+  {
+    "path": "datasets/malware/revil/inf1/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:4723cb5456dc4ab9bc279a96b512d7dd0b2d7a9d8556852a80550ed8a162ac74\nsize 54333175\n"
+  },
+  {
+    "path": "datasets/malware/ryuk/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:2311ff4c481acdfc6a96ce77fd15abe47e4830b16a183384ce0c9841f8285bfa\nsize 10925432\n"
+  },
+  {
+    "path": "datasets/malware/snakemalware/comadmin_windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:5a1cd9e6295dd7865794afc915a9067529eb3f29eae829f26892b20017b6f126\nsize 2301\n"
+  },
+  {
+    "path": "datasets/malware/swift_slicer/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:4173ffa800f02ccd25bc1e9d9bbc35eeb40883d6e8886377db63e34bbe6ce09b\nsize 76113411\n"
+  },
+  {
+    "path": "datasets/malware/trickbot/infection/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:94438dd32541ebd0150f782ba6dcce8fbd12d7c592013d3426c8bb0bb24ae24d\nsize 463822959\n"
+  },
+  {
+    "path": "datasets/malware/vilsel/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:29f318a716934ee6fbf71f4970652a282f8fc00c2a3fc8c3f5c315206e333e79\nsize 7871198\n"
+  },
+  {
+    "path": "datasets/malware/winpeas/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:3d884edd04405659a53f85e3570d96056c01bd58081f175fd9aa9362259872a4\nsize 104085081\n"
+  },
+  {
+    "path": "datasets/malware/winter-vivern/scheduledtask/sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:06df0ee0273af3cb01cc84c550b95a62260d5eb82820554a16d6efc9619cca95\nsize 14559792\n"
+  },
+  {
+    "path": "datasets/malware/xmrig_miner/windows-sysmon.log",
+    "pointer": "version https://git-lfs.github.com/spec/v1\noid sha256:279cbbeda641d10e093a4a3339d04d17c814da164a354a1d57b93ae5b82d2172\nsize 382501906\n"
+  }
+]

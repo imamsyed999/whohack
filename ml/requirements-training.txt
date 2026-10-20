@@ -1,0 +1,4 @@
+# Existing research environment supplies torch/ONNX/numpy; local math only.
+lightgbm==4.7.0
+narwhals==2.27.1
+scipy==1.17.1

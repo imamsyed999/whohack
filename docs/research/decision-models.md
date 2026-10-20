@@ -1,6 +1,9 @@
 # Tier-2 decision models: research and verification
 
-Status: research only (no Vigil Rust code). Date: 2026-10-03. Spec context: `docs/vigil-master-prompt.md`
+Historical research snapshot: 2026-10-03 (before Rust integration). Current runtime,
+qualification results and Jev assessment are in [decision-runtime.md](../decision-runtime.md)
+and [the 2026-10-15 readiness report](../readiness-2026-10-15.md).
+Spec context: `docs/whohack-master-prompt.md`
 sections 4 (budget), 10 (pipeline), 12 (decision model integration) and 17 (ML pipeline).
 
 Every statement below comes from one of four sources, and the source is named where it matters:
@@ -12,11 +15,11 @@ Rerunnable scripts are in `ml/research/`:
 
 | Script | Purpose |
 |---|---|
-| `vigil_cases.py` | Pinned repos/revisions, the malicious and benign test states, Vigil's 5 questions (plain and "described" variants) |
+| `whohack_cases.py` | Pinned repos/revisions, the malicious and benign test states, whohack's 5 questions (plain and "described" variants) |
 | `bench_decision_models.py` | Runs a model on GPU or CPU: full outputs, full per-option distributions, raw logits, token counts, load time, RAM, p50/p95 latency |
 | `onnx_export_bench.py` | Exports to ONNX (official laya exporter call; our own wrapper for opendecider), int8 quantization, onnxruntime CPU benchmark |
 | `decision_sidecar.py` | **Working prototype** of the recommended JSON-lines sidecar (protocol v1, section 9) for both backends |
-| `test_sidecar.py` | Drives the sidecar the way `vigil-decide` would (spawn, ready, decide, ping, error cases, shutdown) |
+| `test_sidecar.py` | Drives the sidecar the way `whohack-decide` would (spawn, ready, decide, ping, error cases, shutdown) |
 | `list_licenses.py` | Lists the license of every installed distribution |
 | `requirements-research.txt` | `pip freeze` of `ml/.venv` |
 
@@ -28,7 +31,7 @@ Rerunnable scripts are in `ml/research/`:
   and accept the same Jev-style question schema. Both return a probability for **every** option of a choice or
   score question. For yes/no, laya returns only `noul = P(true)`, so `P(false) = 1 - noul`. Both
   probability sets can be rebuilt from raw per-option logits (section 3.4 / 4.4).
-* **Zero-shot quality on Vigil's questions:** `opendecider-nano` gives sensible, decisive answers on both test
+* **Zero-shot quality on whohack's questions:** `opendecider-nano` gives sensible, decisive answers on both test
   states. `laya` typed-decisions gives near-uniform distributions; it leans the right way on `verdict` but
   `matches_purpose` is wrong on the benign case. This matches laya's own documentation: base checkpoints are
   "near chance zero-shot" on new workflows, and fine-tuning is where its value is. Neither model answers
@@ -57,7 +60,7 @@ Rerunnable scripts are in `ml/research/`:
     **long-lived Python sidecar speaking JSON lines over stdin/stdout** (protocol in section 9; a working
     prototype is in `ml/research/decision_sidecar.py`).
   * Keep **laya typed-decisions as the fine-tuning challenger**: it has the official recipe the spec asks for.
-    Pick the winner with `evaluate.py` on Vigil's own family-split eval set, as spec 12.1 requires.
+    Pick the winner with `evaluate.py` on whohack's own family-split eval set, as spec 12.1 requires.
   * Spec 12.2's `LayaSidecar` over the ggmlc binary should be replaced by the generic sidecar.
   * The sidecar must apply **per-question temperatures itself**, from returned raw logits. Neither library
     supports per-question temperatures (laya's are per question type and option count; opendecider has none).
@@ -193,7 +196,7 @@ meanings [src `_decode_answers`]:
 | `noul` | P(true). No `probabilities` dict for noul |
 | `confidence` | for noul: max(p). For choice/score: `1 - H(p)/log k`, documented as *not* calibrated |
 | `answer_confidence` | max(p). This is the quantity temperature scaling fits |
-| `action.act_probability` | softmax of a 2-way "act vs escalate" head (`act_costs: {"escalate": 0.5}`). It was 1.0 in every run; not useful to Vigil |
+| `action.act_probability` | softmax of a 2-way "act vs escalate" head (`act_costs: {"escalate": 0.5}`). It was 1.0 in every run; not useful to whohack |
 
 ### 3.3 Input construction, lengths, truncation [src `common.build_head` / `build_sequence`]
 
@@ -215,7 +218,7 @@ One sequence is built **per question**:
 * The instruction is truncated to `max(8, remaining head budget)`.
 * State room = `max_len - len(head) - 1`. Strings and dicts keep the **start** (right-truncation); lists keep the
   end. Dropped tokens are reported in `usage.state_tokens_dropped` / `truncated` / `truncated_questions`.
-* With Vigil's questions the head costs 25–50 tokens, so the room is about 975 state tokens. The "~768" in spec
+* With whohack's questions the head costs 25–50 tokens, so the room is about 975 state tokens. The "~768" in spec
   12.1 is the worst case, when the head uses its full 256 tokens.
 * All question rows of one state run in **one padded forward pass** (batch = number of questions; padded to the
   longest row).
@@ -232,7 +235,7 @@ One sequence is built **per question**:
   * `temperature = [1.0148, 1.0374, 1.0575]`.
   * `temperature_by_options`: `choice:2` 1.906, `choice:3-5` 1.760, `choice:6-10` 1.000, `choice:11+`
     0.1006→**clamped to 0.5**, `score:3-5` 1.251, `noul:2` 1.983.
-  * For Vigil's questions that gives: matches_purpose T=1.983, verdict 1.760, tactic 1.000, severity 1.251,
+  * For whohack's questions that gives: matches_purpose T=1.983, verdict 1.760, tactic 1.000, severity 1.251,
     action 1.760.
 * The model card itself says these are **not trustworthy**: the bucket map was inherited from the base model, and
   the per-type values were fitted on training data. "Treat its confidence as uncalibrated."
@@ -245,10 +248,10 @@ One sequence is built **per question**:
     `{"version":2,"temperature":[3],"temperature_by_options":{...},"model_id_or_path",...}`.
   * Also available: `fit_abstention_thresholds`, `fit_binning_map`, per-language temperatures and a
     `min_confidence` gate.
-* **None of this is per question id.** Vigil's per-question T (spec 12.2) must be applied outside the library.
+* **None of this is per question id.** whohack's per-question T (spec 12.2) must be applied outside the library.
 * **Full per-option distribution:** choice and score already list every option. For noul use
   `{"true": noul, "false": 1 - noul}`.
-* **Raw logits** (needed for Vigil's own per-question calibration). This uses the same private path as
+* **Raw logits** (needed for whohack's own per-question calibration). This uses the same private path as
   `records_from_labeled`:
 
 ```python
@@ -344,7 +347,7 @@ system_one_batch(states: list, questions: dict) -> list[dict]
 
 * `p = softmax(head(h[MASK positions]))`, with no temperature at all [src `nano.py`].
 * "Calibrated" in the README means the student was distilled from temperature-scaled teacher distributions. There
-  is **no runtime calibration API**. Vigil must fit and apply its own per-question T on the logits.
+  is **no runtime calibration API**. whohack must fit and apply its own per-question T on the logits.
 * Raw logits: re-run the head without the softmax (`raw_logits_od` in `bench_decision_models.py`, or
   `OpenDeciderBackend.logits` in the sidecar). Both use the private `NanoModel._build`.
 
@@ -357,7 +360,7 @@ system_one_batch(states: list, questions: dict) -> list[dict]
   `{"benign": 0.568, "malicious": 0.129}`, which **sums to 0.70**. The third (state) marker took probability mass,
   and `zip()` silently dropped it.
 
-Vigil's sanitizer strips `[`/`]` from names, so Vigil's own template should never produce this. Even so, **the
+whohack's sanitizer strips `[`/`]` from names, so whohack's own template should never produce this. Even so, **the
 sidecar must scrub `[MASK] [CLS] [SEP] [PAD] [UNK]` from the state and question text**. The prototype does
 (`scrub()`). laya replaces only `[MASK]`.
 
@@ -370,7 +373,7 @@ stdio), `python -m opendecider.bench_speed`, and a guard preset. There is no per
 
 ## 5. Measurements
 
-Test inputs are in `ml/research/vigil_cases.py`: the malicious state is spec 12.3 verbatim; the benign state is a
+Test inputs are in `ml/research/whohack_cases.py`: the malicious state is spec 12.3 verbatim; the benign state is a
 signed Chrome with vendor/CDN connections, `UNEXPECTED none`, `ANOMALY 0.05`. The questions are spec 12.4, labels
 only. Latency is the **5-question call** on the malicious state: 2 warm-ups, then 20 runs. RAM is measured with
 psutil in a fresh process: RSS, and `peak_wset` (Windows peak working set).
@@ -466,7 +469,7 @@ Observations:
   the base laya checkpoint, or worse, on anything else". The docs report the base checkpoints at 0.36 on
   typed-decisions zero-shot, against 0.318 for random guessing.
 * **opendecider-nano is sensible zero-shot**, and clearly separates the two states on verdict, tactic, severity
-  and action. Under Vigil's fusion policy (spec 10):
+  and action. Under whohack's fusion policy (spec 10):
   * Malicious state: p_malicious 0.42 with Tier-0 rule `T0-001` fired. Rule 2 does not apply (it needs ≥ 0.85).
     Rule 3 (`p_malicious ≥ 0.50 OR p_suspicious ≥ 0.60`) also misses (0.42 / 0.54). That leads to `AskUser` with
     network hold. Any Tier-0 rule floor still applies on top.
@@ -477,7 +480,7 @@ Observations:
   phrasing is the weakest question for both. The typed-decisions training data phrases noul questions as
   declarative statements with explicit true/false criteria (for example
   `"This alert reflects genuinely malicious or unauthorised activity."` with
-  `criteria: {true: "...", false: "..."}`). Vigil should try that style; the fix to rely on is fine-tuning.
+  `criteria: {true: "...", false: "..."}`). whohack should try that style; the fix to rely on is fine-tuning.
 * **Sensitivity to option wording** (`--described` variant, one-line descriptions per option):
   * opendecider benign matches_purpose flipped to yes 0.53.
   * opendecider malicious tactic switched to credential_theft 0.37.
@@ -487,7 +490,7 @@ Observations:
     runtime.
 * For reference, on the public typed-decisions test split (2,000 decisions) the reported accuracies are
   laya-typed-decisions 0.766 and opendecider-nano 0.796. Both were fine-tuned on its train split [card], so these
-  numbers do not transfer to Vigil's task.
+  numbers do not transfer to whohack's task.
 
 ---
 
@@ -594,7 +597,7 @@ output_dir/rl_agent_config.json     # cfg + fine_tuned, model_name, temperature
 A rolling `checkpoint_latest/` is written after every epoch.
 
 **Starting point:** fine-tune from `typed-decisions` (it already saw security-incident workflows) or from the base
-English root checkpoint. Base it on an A/B test on Vigil's validation split [unverified which is better]. On this
+English root checkpoint. Base it on an A/B test on whohack's validation split [unverified which is better]. On this
 machine's 96 GB GPU, a single-device run of the script needs no DDP [unverified runtime].
 
 ### 7.2 opendecider-nano: no official recipe
@@ -619,19 +622,19 @@ machine's 96 GB GPU, a single-device run of the script needs no DDP [unverified 
      * `tok.save_pretrained(dir)`.
      * Copy `opendecider.json`, keeping `"kind": "nano"` and `"max_len": 2048`.
      * `opendecider.load(dir)` then loads it unchanged, because `NanoModel` reads exactly these files.
-  5. Calibration: none at runtime. Fit Vigil's per-question T on the held-out logits (section 7.3) and apply it in
+  5. Calibration: none at runtime. Fit whohack's per-question T on the held-out logits (section 7.3) and apply it in
      the sidecar.
 * Spec 17.5 says "using each project's official fine-tuning recipe". For opendecider this is impossible today.
   Record this as a deviation in `docs/backlog.md` / the M-plan when `ml/finetune.py` is written.
 
-### 7.3 Per-question calibration for Vigil (`calibrate.py`)
+### 7.3 Per-question calibration for whohack (`calibrate.py`)
 
 1. Run the fine-tuned model on the **val** split (family-disjoint) and collect raw logits per question id. The
    sidecar returns them (`answers[i].logits`), as does `bench_decision_models.py`.
 2. For each question id, fit a scalar T by NLL with LBFGS on log T. Reuse `laya.calibrate.fit_one_temperature`
    with `min_n` set to your sample size. It is library-agnostic: it takes `(logits, target)` pairs. Clamp T to
    [0.5, 5].
-3. Store `{question_id: T}` in Vigil config. The sidecar (or Rust) computes `softmax(logits / T)`. Report ECE and
+3. Store `{question_id: T}` in whohack config. The sidecar (or Rust) computes `softmax(logits / T)`. Report ECE and
    Brier before and after, on the **test** split.
 
 ---
@@ -815,8 +818,8 @@ Planned extension (not in the prototype): `{"op":"decide_batch","states":[...],"
 ### 9.3 `max_state_tokens()` for the Rust trait
 
 * opendecider: `2048 - max over questions of (len(question tokens) + len(option tokens) + 4)`. That is about 2,000
-  for Vigil's questions.
-* laya: `1024 - len(head) - 1`, where the head is at most 256 + 3 tokens. That is about 975 for Vigil's questions,
+  for whohack's questions.
+* laya: `1024 - len(head) - 1`, where the head is at most 256 + 3 tokens. That is about 975 for whohack's questions,
   and 765 in the worst case.
 * Unit-test the Rust state builder against the HF tokenizer. The `tokenizers` Rust crate can load the
   `tokenizer.json` shipped with each model; both models share the same vocabulary. The test should check that the
@@ -831,7 +834,7 @@ Planned extension (not in the prototype): `{"op":"decide_batch","states":[...],"
 2. **opendecider fine-tuning is unofficial.** Section 7.2 is derived from source and untested. Spec 17.5's
    "official recipe" requirement cannot be met for opendecider until upstream ships one.
 3. **Zero-shot results come from two hand-written states.** They show direction, not accuracy. Decide only on
-   Vigil's family-split eval (spec 17.6).
+   whohack's family-split eval (spec 17.6).
 4. **The opendecider bf16 RAM fit is thin** (1.16 GB peak against a 1.2 GB limit). It depends on the CPU-only torch
    wheel and on the transformers version. Add a RAM regression test to the perf suite.
 5. **Licenses to review before shipping:**

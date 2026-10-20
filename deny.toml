@@ -4,7 +4,8 @@
 # `unicode-ident`) and Zlib (`foldhash`) are permissive and approved.
 # "Apache-2.0 WITH LLVM-exception" (wasmtime/cranelift, via yara-x) is
 # Apache-2.0 plus an additional permission, so it is within policy.
-# Anything else fails CI and needs explicit maintainer approval.
+# Exact MPL exceptions below were approved by the maintainer on 2026-10-15.
+# Anything else fails CI and needs a recorded review.
 
 [licenses]
 allow = [
@@ -20,25 +21,59 @@ allow = [
 confidence-threshold = 0.9
 unused-allowed-license = "allow"
 
+# Existing Tauri transitive dependencies; never a blanket MPL allowance.
+[[licenses.exceptions]]
+name = "cssparser"
+version = "=0.37.0"
+allow = ["MPL-2.0"]
+
+[[licenses.exceptions]]
+name = "cssparser-macros"
+version = "=0.7.1"
+allow = ["MPL-2.0"]
+
+[[licenses.exceptions]]
+name = "dtoa-short"
+version = "=0.3.5"
+allow = ["MPL-2.0"]
+
+[[licenses.exceptions]]
+name = "selectors"
+version = "=0.38.0"
+allow = ["MPL-2.0"]
+
+[[licenses.exceptions]]
+name = "option-ext"
+version = "=0.2.0"
+allow = ["MPL-2.0"]
+
 [advisories]
 yanked = "deny"
 # Each ignore is reviewed and tracked in docs/backlog.md; remove when fixed upstream.
 ignore = [
+    # Reviewed 2026-10-15: GTK 0.18 procedural macros, build-time only; no patched
+    # release. Retire when Tauri's GTK chain migrates. See the license review.
+    { id = "RUSTSEC-2024-0370", reason = "unmaintained GTK build-time macro dependency; reviewed exception pending upstream migration" },
     # bincode 2 is unmaintained (pulled in by yara-x for rule serialization); informational only.
     { id = "RUSTSEC-2025-0141", reason = "unmaintained notice; used only by yara-x internals" },
     # rsa timing side channel affects private-key operations; yara-x only verifies
-    # Authenticode signatures with public keys, so Vigil is not exposed.
+    # Authenticode signatures with public keys, so whohack is not exposed.
     { id = "RUSTSEC-2023-0071", reason = "no private-key operations performed" },
-    # wasmtime type-index confusion across multiple Engines (CVSS 3.8). Vigil runs a single
+    # wasmtime type-index confusion across multiple Engines (CVSS 3.8). whohack runs a single
     # yara-x rule set (one engine). No yara-x release yet uses a patched wasmtime (>= 46.0.2).
     { id = "RUSTSEC-2026-0222", reason = "single engine; awaiting yara-x wasmtime bump" },
     # The following wasmtime advisories concern WASI filesystem sandboxing, the
     # component model, and hostcall fuel accounting. yara-x compiles *trusted*
     # rule sources to core wasm and never loads untrusted wasm modules, WASI, or
-    # components, so these code paths are not reachable from Vigil.
+    # components, so these code paths are not reachable from whohack.
     { id = "RUSTSEC-2026-0269", reason = "WASI filesystem not used by yara-x" },
     { id = "RUSTSEC-2026-0316", reason = "component model not used by yara-x" },
     { id = "RUSTSEC-2026-0327", reason = "component model async not used by yara-x" },
+    # Reviewed 2026-10-15 against the locked feature graph and scanner entrypoints.
+    # CI checks these assumptions in tools/ci/check_wasmtime_surface.py.
+    { id = "RUSTSEC-2026-0359", reason = "no untrusted WASM or recursive GC types; only trusted YARA compiled to core WASM" },
+    { id = "RUSTSEC-2026-0362", reason = "Wasmtime async feature absent; YARA scanner uses synchronous calls" },
+    { id = "RUSTSEC-2026-0363", reason = "Wasmtime component-model feature absent; no component resource handles" },
 ]
 
 [bans]

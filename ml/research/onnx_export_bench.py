@@ -18,7 +18,7 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import vigil_cases as vc  # noqa: E402
+import whohack_cases as vc  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument("mode", choices=["export", "bench"])

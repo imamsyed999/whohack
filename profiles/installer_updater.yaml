@@ -1,0 +1,18 @@
+category: installer_updater
+expected:
+  - "file:read_documents"
+  - "file:write_own_dir"
+  - "network:vendor_domain"
+  - "network:known_cdn"
+  - "exec:child_from_downloads_or_temp"
+  - "persistence:startup_folder"
+  - "persistence:service"
+  - "persistence:launch_agent"
+  - "persistence:systemd_unit"
+  - "persistence:autostart"
+never:
+  - "defense_evasion:*"
+  - "impact:*"
+  - "injection:*"
+  - "credential_access:*"
+

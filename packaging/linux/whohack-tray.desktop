@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=whohack
+Comment=whohack anti-hack protection: alerts and controls
+Exec=/usr/bin/whohack-tray
+Icon=whohack
+Terminal=false
+Categories=System;Security;
+X-GNOME-Autostart-enabled=true

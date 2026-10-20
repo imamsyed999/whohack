@@ -1,0 +1,49 @@
+# Every rule requires all listed tags. Sign/path lists match any listed value.
+- id: downloaded-browser-passwords
+  description: "A tainted unsigned process accessed a browser password store."
+  severity: critical
+  action_floor: block_network
+  match:
+    tags: ["credential_access:browser_passwords"]
+    tainted: true
+    sign: ["unsigned","invalid"]
+- id: shadow-copy-delete
+  description: "Recovery snapshot deletion was observed."
+  severity: critical
+  action_floor: block_network
+  match:
+    tags: ["defense_evasion:shadow_copy_delete"]
+- id: mass-file-modification
+  description: "A download-related process rapidly modified user files; review for possible ransomware."
+  severity: critical
+  action_floor: block_network
+  match:
+    tags: ["impact:mass_file_modification"]
+    tainted: true
+- id: threat-intel-destination
+  description: "A connection matched a threat intelligence indicator."
+  severity: critical
+  action_floor: block_network
+  match:
+    tags: ["network:intel_hit"]
+- id: non-system-lsass
+  description: "A process outside the system directory accessed authentication memory."
+  severity: critical
+  action_floor: block_network
+  match:
+    tags: ["credential_access:lsass"]
+    not_path_class: ["system"]
+- id: tainted-injection
+  description: "A tainted process injected code into another process."
+  severity: critical
+  action_floor: block_network
+  match:
+    tags: ["injection:remote_thread"]
+    tainted: true
+- id: tainted-beaconing
+  description: "A tainted process repeatedly connected at regular intervals."
+  severity: high
+  action_floor: block_network
+  match:
+    tags: ["network:beaconing"]
+    tainted: true

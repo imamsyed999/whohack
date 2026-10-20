@@ -1,0 +1,7 @@
+{
+  "synthetic": true,
+  "trained": false,
+  "feature_schema": 1,
+  "sha256": "44174712a05026ac1d5917193e8ab49ff10560512b5b705c9258be2325534f98",
+  "purpose": "Loading/inference contract test only; no detection accuracy claim"
+}

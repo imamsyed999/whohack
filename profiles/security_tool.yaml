@@ -1,0 +1,12 @@
+category: security_tool
+expected:
+  - "file:read_documents"
+  - "file:write_own_dir"
+  - "network:vendor_domain"
+  - "network:known_cdn"
+  - "discovery:process_enum"
+  - "discovery:system_info"
+never:
+  - "impact:*"
+  - "defense_evasion:*"
+

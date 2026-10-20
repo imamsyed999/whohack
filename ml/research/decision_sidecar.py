@@ -1,4 +1,4 @@
-"""Prototype of the Vigil Tier-2 decision sidecar: a long-lived process speaking JSON lines.
+"""Prototype of the whohack Tier-2 decision sidecar: a long-lived process speaking JSON lines.
 
     python ml/research/decision_sidecar.py --backend opendecider --model-dir <dir> --device cpu --threads 4
     python ml/research/decision_sidecar.py --backend laya --model-dir <dir>/typed-decisions --device cpu --threads 4
@@ -25,10 +25,12 @@ import json
 import os
 import sys
 import time
+import math
+from pathlib import Path
 
 # The sidecar must never touch the network: everything is loaded from --model-dir.
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ.setdefault("USE_TF", "0")
 
 ap = argparse.ArgumentParser()
@@ -36,10 +38,25 @@ ap.add_argument("--backend", choices=["laya", "opendecider"], required=True)
 ap.add_argument("--model-dir", required=True, help="local checkpoint directory (no Hub access)")
 ap.add_argument("--device", default="cpu")
 ap.add_argument("--threads", type=int, default=4)
+ap.add_argument("--dtype", choices=["float32", "bfloat16"], default="float32")
+ap.add_argument("--min-ram-gb", type=int, default=0)
 ap.add_argument("--calibration", default=None,
                 help='JSON {"<question id>": temperature}; missing ids use the backend default')
 ap.add_argument("--max-line-bytes", type=int, default=1 << 20)
 args = ap.parse_args()
+if not Path(args.model_dir).is_dir() or args.device != "cpu" or not 1 <= args.threads <= 4:
+    ap.error("serving requires a local directory, CPU, and 1-4 threads")
+if args.min_ram_gb:
+    import psutil
+    if psutil.virtual_memory().total < args.min_ram_gb * 1024 ** 3:
+        ap.error("insufficient physical memory for the optional deep model")
+
+# Defense in depth for Python libraries. This is not an OS security boundary:
+# compiled native code is covered by the separate deployment sandbox requirement.
+def offline_guard(event, _args):
+    if event in {"socket.connect", "socket.connect_ex", "socket.getaddrinfo", "socket.bind", "socket.sendto"}:
+        raise PermissionError("whohack decision serving is offline")
+sys.addaudithook(offline_guard)
 if args.device == "cpu":
     os.environ["OMP_NUM_THREADS"] = str(args.threads)
     os.environ["MKL_NUM_THREADS"] = str(args.threads)
@@ -66,7 +83,7 @@ def lower_priority():
 
 
 def to_library_question(q):
-    """Vigil question -> TypeSafe/Jev-style dict understood by both libraries; returns (dict, labels)."""
+    """whohack question -> TypeSafe/Jev-style dict understood by both libraries; returns (dict, labels)."""
     kind, text = q.get("kind"), q.get("text")
     if not isinstance(text, str) or not text.strip():
         raise ValueError(f"question {q.get('id')!r}: 'text' must be a non-empty string")
@@ -90,10 +107,19 @@ def to_library_question(q):
 
 class LayaBackend:
     def __init__(self):
+        # Laya patches old tokenizer configs during Agent construction. Serving
+        # pinned files must be read-only: require a compatible prepared config.
+        from pathlib import Path
+        root = Path(args.model_dir)
+        config = json.loads((root / 'tokenizer/tokenizer_config.json').read_text(encoding='utf-8'))
+        if config.get('tokenizer_class') in (None, 'TokenizersBackend') or isinstance(config.get('extra_special_tokens'), list):
+            raise ValueError('Normalize the Laya tokenizer config using its documented compatibility migration, then regenerate the model manifest before serving')
         import laya
         from laya.common import QTYPES, temp_bucket
         self._qtypes, self._bucket = QTYPES, temp_bucket
         self.agent = laya.Agent(args.model_dir, device=args.device)
+        if args.dtype != "float32":
+            raise ValueError("Laya serving currently requires float32; use the measured OpenDecider bf16 adapter for lower memory")
         self.name = self.agent.cfg.get("model_name", "laya")
         self.max_len = self.agent.cfg.get("max_len")
 
@@ -112,6 +138,8 @@ class LayaBackend:
             a._check_question(qid, lib_qs[qid])
         internal = {qid: a._to_internal(lib_qs[qid]) for qid in ids}
         items = a._encode_state(state, ids, internal)
+        if any(it["state_stats"]["truncated"] for it in items):
+            raise ValueError("state budget exceeded; refusing truncated evidence")
         b = collate_items([items], a.tok.pad_token_id)
         logits, _ = a._forward(b)
         rows = _option_logits(logits, items, 0)
@@ -130,7 +158,7 @@ class LayaBackend:
 class OpenDeciderBackend:
     def __init__(self):
         from opendecider import load
-        self.model = load(args.model_dir, device=args.device)
+        self.model = load(args.model_dir, device=args.device, dtype=args.dtype)
         self.impl = self.model.impl
         self.name = self.model.name
         self.max_len = self.impl.max_len
@@ -149,6 +177,8 @@ class OpenDeciderBackend:
             built.append(impl._build(state, qd["instructions"], opts))
             opt_lists.append(list(opts))
         rows = [b for b, _ in built]
+        if any(tr for _, tr in built):
+            raise ValueError("state budget exceeded; refusing truncated evidence")
         L, pad = max(map(len, rows)), impl.tok.pad_token_id
         x = torch.tensor([r + [pad] * (L - len(r)) for r in rows], device=impl.device)
         att = torch.tensor([[1] * len(r) + [0] * (L - len(r)) for r in rows], device=impl.device)
@@ -185,8 +215,14 @@ def handle_decide(backend, calib, req):
     if not isinstance(state, str) or not state:
         raise ValueError("'state' must be a non-empty string")
     state = scrub(state)
+    tokenizer = backend.agent.tok if args.backend == "laya" else backend.impl.tok
+    budget = req.get("max_state_tokens", 768)
+    if not isinstance(budget, int) or not 128 <= budget <= 1536:
+        raise ValueError("invalid state token budget")
+    if len(tokenizer.encode(state, add_special_tokens=False)) > budget:
+        raise ValueError("state budget exceeded; refusing truncated evidence")
     qs = req.get("questions")
-    if not isinstance(qs, list) or not qs:
+    if not isinstance(qs, list) or not 1 <= len(qs) <= 64:
         raise ValueError("'questions' must be a non-empty array")
     lib_qs, labels = {}, {}
     for q in qs:
@@ -200,6 +236,8 @@ def handle_decide(backend, calib, req):
     for qid in lib_qs:
         z = logits[qid]
         t = float(calib.get(qid, backend.default_temperature(lib_qs[qid], len(z))))
+        if not math.isfinite(t) or t <= 0 or not all(math.isfinite(v) for v in z):
+            raise ValueError("nonfinite logits or invalid calibration temperature")
         answers.append({"id": qid, "labels": labels[qid], "logits": [round(v, 6) for v in z],
                         "probs": [round(p, 6) for p in softmax(z, t)], "temperature": t})
     return {"answers": answers, "usage": usage, "latency_ms": round((time.perf_counter() - t0) * 1000, 1)}
@@ -216,11 +254,11 @@ def main():
           "device": args.device, "threads": args.threads if args.device == "cpu" else None,
           "max_len": backend.max_len, "load_ms": round((time.perf_counter() - t0) * 1000)})
     stdin = open(sys.stdin.fileno(), "rb", closefd=False)
-    for raw in stdin:
+    while raw := stdin.readline(args.max_line_bytes + 1):
         rid = None
         try:
             if len(raw) > args.max_line_bytes:
-                raise ValueError("request line too long")
+                return 2  # fail closed without consuming an unbounded line
             req = json.loads(raw.decode("utf-8"))
             if not isinstance(req, dict):
                 raise ValueError("request must be a JSON object")

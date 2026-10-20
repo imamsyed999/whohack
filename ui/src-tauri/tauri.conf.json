@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Vigil",
-  "version": "0.1.0",
-  "identifier": "org.vigil.tray",
+  "productName": "whohack",
+  "version": "0.1.1",
+  "identifier": "org.whohack.tray",
   "build": {
     "frontendDist": "../dist"
   },
@@ -11,7 +11,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Vigil",
+        "title": "whohack",
         "width": 1000,
         "height": 700,
         "minWidth": 720,

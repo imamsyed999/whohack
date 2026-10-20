@@ -1,4 +1,4 @@
-"""Drive decision_sidecar.py the way vigil-decide would: spawn it, wait for `ready`, send requests
+"""Drive decision_sidecar.py the way whohack-decide would: spawn it, wait for `ready`, send requests
 over stdin, read JSON lines from stdout, check error handling, shut it down.
 
     python ml/research/test_sidecar.py --backend opendecider --device cpu
@@ -13,7 +13,7 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import vigil_cases as vc  # noqa: E402
+import whohack_cases as vc  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--backend", choices=["laya", "opendecider"], required=True)
@@ -29,7 +29,7 @@ if args.backend == "laya":
 else:
     model_dir = snapshot_download(vc.OD_REPO, revision=vc.OD_REVISION)
 
-VIGIL_QUESTIONS = [
+WHOHACK_QUESTIONS = [
     {"id": "matches_purpose", "kind": "yes_no", "text": vc.QUESTIONS["matches_purpose"]["instructions"]},
     {"id": "verdict", "kind": "choice", "text": vc.QUESTIONS["verdict"]["instructions"],
      "options": vc.QUESTIONS["verdict"]["criteria"]},
@@ -56,7 +56,7 @@ def send(obj):
 ready = json.loads(proc.stdout.readline())
 print("ready after %.1fs:" % (time.perf_counter() - t0), ready)
 for rid, state in (("mal", vc.STATE_MALICIOUS), ("ben", vc.STATE_BENIGN)):
-    r = send({"id": rid, "op": "decide", "state": state, "questions": VIGIL_QUESTIONS})
+    r = send({"id": rid, "op": "decide", "state": state, "questions": WHOHACK_QUESTIONS})
     print(f"\n== {rid}: ok={r['ok']} latency_ms={r.get('latency_ms')} usage={r.get('usage')}")
     for a in r["answers"]:
         print(f"  {a['id']:16s} T={a['temperature']:.3f} " +

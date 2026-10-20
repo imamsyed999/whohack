@@ -1,0 +1,17 @@
+mode = "monitor"
+
+[paths]
+data_dir = "/var/lib/whohack-preview"
+log_dir = "/var/log/whohack-preview"
+rules_dir = "/etc/whohack-preview/rules"
+
+[collect]
+backend = "poll"
+dns = false
+
+[ipc]
+endpoint = "/run/whohack-preview/whohack.sock"
+
+[response]
+enabled = false
+automatic = false

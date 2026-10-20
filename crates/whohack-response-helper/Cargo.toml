@@ -1,0 +1,13 @@
+[package]
+name = "whohack-response-helper"
+description = "One approved Windows network block with automatic lease cleanup"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+whohack-respond = { path = "../whohack-respond" }
+
+[lints]
+workspace = true

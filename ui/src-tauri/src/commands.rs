@@ -1,10 +1,48 @@
 //! Commands invoked by the web UI.
 
 use tauri::State;
-use vigil_core::{Action, AllowEntry, ResponseMode};
-use vigil_ipc::{AlertSummary, EventSummary, Request, Response, StatusInfo};
+use whohack_core::{Action, AllowEntry, ResponseMode};
+use whohack_ipc::{AlertSummary, EventSummary, Request, Response, StatusInfo};
 
 use crate::conn::Conn;
+
+#[tauri::command]
+pub async fn decision_details(conn: State<'_, Conn>, alert_id: i64) -> Result<Response, String> {
+    conn.call(Request::DecisionDetails { alert_id }).await
+}
+
+#[tauri::command]
+pub async fn responses(conn: State<'_, Conn>) -> Result<Response, String> {
+    conn.call(Request::ListResponses).await
+}
+
+#[tauri::command]
+pub async fn release_response(conn: State<'_, Conn>, id: String) -> Result<(), String> {
+    conn.call(Request::ReleaseResponse { id }).await.map(|_| ())
+}
+
+#[tauri::command]
+pub async fn restore_quarantine(conn: State<'_, Conn>, id: String) -> Result<(), String> {
+    conn.call(Request::RestoreQuarantine { id })
+        .await
+        .map(|_| ())
+}
+
+#[tauri::command]
+pub async fn profiles(conn: State<'_, Conn>) -> Result<Response, String> {
+    conn.call(Request::ListProfiles { limit: 500 }).await
+}
+
+#[tauri::command]
+pub async fn set_category(
+    conn: State<'_, Conn>,
+    app_id: String,
+    category: String,
+) -> Result<(), String> {
+    conn.call(Request::SetCategory { app_id, category })
+        .await
+        .map(|_| ())
+}
 
 fn unexpected(r: Response) -> String {
     format!("unexpected response from service: {r:?}")
@@ -13,7 +51,7 @@ fn unexpected(r: Response) -> String {
 #[tauri::command]
 pub async fn status(conn: State<'_, Conn>) -> Result<StatusInfo, String> {
     match conn.call(Request::Status).await? {
-        Response::Status { status } => Ok(status),
+        Response::Status { status } => Ok(*status),
         r => Err(unexpected(r)),
     }
 }

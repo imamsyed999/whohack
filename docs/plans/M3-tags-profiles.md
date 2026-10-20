@@ -4,6 +4,25 @@ Goal: every observation is mapped to capability tags (SPEC §9). Each app has an
 expected-behavior profile for its category (SPEC §12.5). Tags outside the profile are
 "unexpected", which is the core signal of a hidden hack.
 
+## Implementation sequence (2026-10-13)
+
+1. Restore `vigil-tags` as a workspace crate; implement the complete taxonomy,
+   bounded network history, path classification, and event mapping.
+2. Ship and validate all 19 YAML category templates; implement the conservative
+   install-time flow with deterministic model fixtures in tests. Without a configured
+   model or user classification, use `other`; never infer trust from a filename.
+3. Wire tags into live observations, persist tags and initial profiles, and show
+   tags in the monitor and timeline. Use existing profiles on restart.
+4. Add a local-only beacon simulator and deterministic replay acceptance test.
+   The replay covers file and persistence events without accessing real secrets.
+5. Run formatting, Clippy, the full workspace tests, and a live monitor smoke test.
+
+Privileged filesystem collectors remain a separate follow-up: current live collectors
+report processes, network, and DNS only. Classifying replayed file events does not imply
+live file visibility. Document this explicitly rather than claiming full M3 acceptance.
+YAML parsing uses the MIT/Apache-2.0, local-only `serde-saphyr` crate; no network client
+or OS policy changes are introduced.
+
 Acceptance: `tools/beacon-sim`, run as a tainted process categorized as `pdf_reader`, yields
 the expected **unexpected-tag set**:
 

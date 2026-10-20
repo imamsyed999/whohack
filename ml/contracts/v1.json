@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "thresholds": {
+    "malicious": 0.85,
+    "corroborating_score": 0.8,
+    "block_malicious": 0.5,
+    "block_suspicious": 0.6,
+    "allow_benign": 0.8,
+    "escalation": 0.6
+  },
+  "features": [
+    "new_destinations",
+    "raw_ip_connections",
+    "distinct_ports",
+    "child_processes",
+    "sensitive_accesses",
+    "persistence_writes",
+    "bytes_up",
+    "bytes_down",
+    "upload_download_ratio",
+    "interval_cv",
+    "unexpected_severity",
+    "tainted",
+    "unsigned",
+    "path_class",
+    "signature_class",
+    "byte_visibility",
+    "window_saturated"
+  ],
+  "questions": [
+    {
+      "id": "matches_purpose",
+      "kind": "yes_no",
+      "text": "Is this behavior consistent with what an application of this category normally does?"
+    },
+    {
+      "id": "verdict",
+      "kind": "choice",
+      "text": "Overall, is this activity benign, suspicious, or malicious?",
+      "options": [
+        "benign",
+        "suspicious",
+        "malicious"
+      ]
+    },
+    {
+      "id": "tactic",
+      "kind": "choice",
+      "text": "Which attacker goal does this activity most resemble?",
+      "options": [
+        "none",
+        "credential_theft",
+        "persistence",
+        "command_and_control",
+        "ransomware",
+        "data_exfiltration",
+        "reconnaissance"
+      ]
+    },
+    {
+      "id": "severity",
+      "kind": "score",
+      "text": "How severe would the impact be if this is malicious? 0 none, 1 low, 2 high, 3 critical.",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    {
+      "id": "action",
+      "kind": "choice",
+      "text": "What should a careful security analyst do right now?",
+      "options": [
+        "allow",
+        "ask_user",
+        "block_network",
+        "kill_and_quarantine"
+      ]
+    }
+  ]
+}
