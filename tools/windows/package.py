@@ -27,7 +27,7 @@ def main() -> None:
         raise ValueError('Generate and review complete third-party notices before packaging')
     files[Path('THIRD-PARTY-NOTICES.txt')] = inventory.with_suffix('.txt')
     files[Path('THIRD-PARTY-NOTICES.json')] = inventory
-    for name in ('docs/readiness-2026-10-15.md', 'docs/advisory-review-2026-10-15.md', 'docs/backlog.md', 'docs/download-protection.md', 'docs/plans/M14-whohack-and-data.md'):
+    for name in ('docs/readiness-2026-10-15.md', 'docs/advisory-review-2026-10-15.md', 'docs/backlog.md', 'docs/download-protection.md', 'docs/plans/M14-whohack-and-data.md', 'docs/plans/M15-download-activity.md', 'Update whohack.cmd'):
         files[Path(name)] = ROOT / name
     for name in ("Start whohack.cmd", "LICENSE-MIT", "LICENSE-APACHE", "SECURITY.md", "docs/licenses.md", "docs/license-review-2026-10-14.md", "docs/native-sensors.md", "docs/response-and-feeds.md", "docs/decision-runtime.md", "docs/scoring.md", "docs/training.md", "ml/reports/eval.md", "tools/intel/update.py", "tools/intel/virustotal.py"):
         files[Path(name)] = ROOT / name

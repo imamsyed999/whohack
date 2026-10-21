@@ -1,5 +1,18 @@
 # Downloaded-content protection
 
+The **Download activity** home screen shows up to 20 recently associated apps,
+their downloaded inputs and up to 12 recent behavior records per app. “File read
+observed” is stronger evidence than “Named at launch”; inherited context does not
+prove a child read the file. These associations and connections are not verdicts.
+The app shows sensor gaps, missing file visibility and stale/offline state.
+Use **Alerts** to review detections and **Actions & files** to check actual
+pauses, resume an app or restore a quarantined file.
+
+The input list stays bounded at eight items per process. New opens replace the
+oldest inherited context first, then the oldest local input. Repeated reads of
+the same bytes retain the first association time, keeping earlier connections
+in the activity window. See [M15 validation](plans/M15-download-activity.md).
+
 whohack can now associate downloaded documents, video and audio with the process
 opening them, pause that process on qualified danger signals, and show the file
 and reason in an alert. This is a tested detection/response feature in an
@@ -165,3 +178,31 @@ On this PC, offline maintenance reduced the database from 2,146,643,968 to
 the response journal unchanged. The previous raw timeline had almost seven
 million rows, mainly file access. The [storage milestone](plans/M12-lightweight-storage.md)
 records the scoped verification and development-cache cleanup.
+
+
+## Optional folder checks (M16 source implementation)
+
+The separate **Folder scan (optional)** view asks installed Microsoft Defender to
+inspect a selected local folder and its contents. It runs in a background job
+while whohack's main process monitoring continues. The default is report-only;
+permitting Defender remediation requires a separate choice and confirmation.
+Defender manages its own quarantine, and those items are not whohack vault items.
+The selected root must be an existing absolute local folder without link/reparse
+ancestors; device/network paths and drive roots are rejected. Windows controls
+traversal inside the selected folder. These are best-effort path checks, not a
+race-proof security boundary.
+
+One job runs at a time. Output is bounded; there is no invented percentage or
+file count. whohack requests a stop after ten minutes and provides a stop button
+for its own scanner client. Defender may finish already-submitted work after the
+client stops, and OS waits can take longer. A completed scan is not a safety
+certificate. Report-only scans inspect archives, ignore file exclusions and
+print detections in the report instead of Windows Security history. Defender's
+Windows cloud protection and sample submission settings apply.
+[Microsoft's command-line reference](https://learn.microsoft.com/en-us/defender-endpoint/command-line-arguments-microsoft-defender-antivirus).
+
+The new service/tray compile and focused checks pass, but Windows Application
+Control blocked execution of the new service with error 4551 before the isolated
+end-to-end folder test could start. The normal service was also found stopped.
+This optional feature is not active in the installed running configuration; see
+[M16 exact-build validation and limitations](plans/M16-optional-folder-check.md).

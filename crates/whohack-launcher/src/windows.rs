@@ -219,6 +219,10 @@ async fn start(layout: &Layout, tray: bool) -> Result<()> {
     }
     let cfg = layout.prepare()?;
     let mut ready = status(&cfg).await;
+    ensure!(
+        ready.as_ref().is_none_or(|s| s.download_activity_available),
+        "An older Vigil/whohack service is still running. To apply the new name and download view, right-click Update whohack.cmd and choose Run as administrator. This preserves your configuration and saved data."
+    );
     if ready.is_none() {
         // A running, unresponsive session must be inspected, never duplicated.
         if let Ok(lock) = OpenOptions::new()

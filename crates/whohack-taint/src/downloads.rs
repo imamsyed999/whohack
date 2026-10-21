@@ -7,9 +7,17 @@ use crate::{FileAnalyzer, origin, path_class, script};
 pub const MAX_INPUTS: usize = 8;
 const MAX_INPUT_SCAN_BYTES: u64 = 16 * 1024 * 1024;
 
-fn local_regular(path: &Path) -> bool {
+/// Existing local path with no link/reparse ancestors. This is a best-effort
+/// path check, not a handle-based authorization for deleting arbitrary files.
+pub fn local_path(path: &Path) -> bool {
     let text = path.to_string_lossy();
-    if !path.is_absolute() || text.len() > 4096 || text.chars().any(char::is_control) {
+    if !path.is_absolute()
+        || text.len() > 4096
+        || text.chars().any(char::is_control)
+        || path
+            .components()
+            .any(|c| matches!(c, std::path::Component::ParentDir))
+    {
         return false;
     }
     #[cfg(windows)]
@@ -48,16 +56,11 @@ fn local_regular(path: &Path) -> bool {
             }
         }
     }
-    std::fs::symlink_metadata(path).is_ok_and(|m| {
-        #[cfg(windows)]
-        {
-            use std::os::windows::fs::MetadataExt;
-            if m.file_attributes() & 0x400 != 0 {
-                return false;
-            }
-        }
-        m.is_file() && !m.file_type().is_symlink()
-    })
+    true
+}
+
+fn local_regular(path: &Path) -> bool {
+    local_path(path) && std::fs::symlink_metadata(path).is_ok_and(|m| m.is_file())
 }
 
 pub fn analyze_input(

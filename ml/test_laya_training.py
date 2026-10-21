@@ -52,6 +52,26 @@ class TrainingBudgetTests(unittest.TestCase):
         with self.assertRaises(ResourceStop):
             guard.check(None, None)
 
+    def test_each_forward_yields_and_does_not_ignore_monitor_stop(self):
+        guard = ResourceGuard('.', Budget())
+        guard.torch = Mock()
+        guard.next_yield = float('inf')
+        with patch('training_budget.time.sleep') as idle:
+            guard.check(Mock(), ())
+            guard.check(Mock(), ())
+        self.assertEqual(guard.torch.cuda.synchronize.call_count, 2)
+        self.assertEqual(idle.call_count, 2)
+        def stop_during_idle(_):
+            guard.reason = 'GPU telemetry is stale'
+        with patch('training_budget.time.sleep', side_effect=stop_during_idle):
+            with self.assertRaisesRegex(ResourceStop, 'stale'):
+                guard.check(Mock(), ())
+
+    def test_forward_idle_is_bounded(self):
+        for value in [0, .01, 1, float('nan'), float('inf'), True]:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                ResourceGuard('.', Budget(), forward_idle_seconds=value)
+
     def test_gpu_stream_rejects_stale_and_exited_samples(self):
         stream = NvidiaTelemetry()
         stream.process = Mock()
@@ -74,6 +94,30 @@ class TrainingBudgetTests(unittest.TestCase):
         stream.error = 'ValueError'
         with self.assertRaises(ResourceStop):
             stream.sample()
+
+    def test_nvml_source_timestamp_cannot_be_refreshed_by_pipe_delay(self):
+        stream = NvidiaTelemetry('nvml')
+        with patch('training_budget.time.monotonic', return_value=12):
+            stream.accept('10,100,60')
+            self.assertEqual(stream.last, (10, 100 * 1024**2, 60))
+            for bad in ['10,100,60', '2,100,60', '13,100,60', 'nan,100,60']:
+                with self.subTest(bad=bad), self.assertRaises(ValueError):
+                    stream.accept(bad)
+        with patch('training_budget.time.monotonic', return_value=30), self.assertRaises(ValueError):
+            stream.accept('11,100,60')
+
+    def test_watchdog_exits_even_if_reporting_and_worker_cleanup_fail(self):
+        guard = ResourceGuard('.', Budget())
+        guard.reason = 'GPU telemetry is stale'
+        guard.stopped = Mock()
+        guard.stopped.wait.side_effect = [False, False]
+        guard.gpu = Mock()
+        guard.gpu.close.side_effect = OSError('cannot terminate worker')
+        with patch.object(guard, 'write_report', side_effect=OSError('disk full')):
+            with patch('training_budget.os._exit') as emergency_exit:
+                with self.assertRaises(OSError):
+                    guard._monitor()
+                emergency_exit.assert_called_once_with(75)
 
     def test_stale_sample_during_cooperative_pause_latches_stop(self):
         guard = ResourceGuard('.', Budget())

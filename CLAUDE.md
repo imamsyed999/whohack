@@ -76,6 +76,30 @@ repeating approval requests for work already authorized. Preserve unrelated work
 
 ## Project facts and verification
 
+- M16 reaffirms download-open/run behavior protection as primary and folder checks
+  as optional. The new dataset contains 1,067 cases, including 90 weak public
+  observations from 138 text logs and 160 new authored states. Prior M13/M14
+  holdouts remain excluded. Three new Laya training attempts stopped on stale GPU
+  telemetry before completing an epoch; no new checkpoint or accuracy improvement
+  exists. Preserve the data and stop reports. The optional NVML monitor retains
+  all original limits and now validates source timestamps; never weaken the
+  guard to complete training. See `docs/plans/M16-download-decisions.md`.
+- Concurrent folder-check changes were reconciled around Microsoft Defender,
+  with report-only default and explicit remediation choice. Follow the exact
+  build/activation status in `docs/plans/M16-optional-folder-check.md`; source
+  implementation is not proof that this PC is running it. The configured legacy
+  service stopped during this work, and Windows Application Control blocked the
+  new service acceptance launch. Do not bypass OS policy or the earlier canceled
+  elevation. No Laya model has been enabled.
+
+- M15 adds the download activity UI/API and fixes bounded-input eviction and
+  repeated-read timestamps. Downloaded-file associations are evidence, not safety
+  verdicts. Keep the read/argument/inherited distinctions and PID reuse bounds.
+  The existing elevated 0.1.0 service remains running because Windows elevation
+  for this session was canceled. Do not bypass or repeat that denied elevation.
+  `Update whohack.cmd` is the explicit administrator restart entry point.
+  See `docs/plans/M15-download-activity.md` for checks and exact-build limits.
+
 - Rust stable, edition 2024; root workspace `crates/*`, separate UI workspace
   `ui/src-tauri`. whohack source is MIT OR Apache-2.0; dependency licenses remain theirs.
 - Every `i64` timestamp is Unix milliseconds UTC (`whohack_core::time`). `Action`

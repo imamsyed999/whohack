@@ -16,6 +16,7 @@ pub const MODE_SETTING: &str = "mode";
 /// Live service state shared with the IPC handler.
 #[derive(Debug)]
 pub struct ServiceState {
+    pub folder_scans: crate::folder_scan::FolderScans,
     pub mode: RwLock<ResponseMode>,
     pub collectors: Vec<String>,
     pub dns_visible: bool,
@@ -36,6 +37,7 @@ pub struct ServiceState {
 impl ServiceState {
     pub fn new(mode: ResponseMode, collectors: Vec<String>, dns_visible: bool) -> Self {
         ServiceState {
+            folder_scans: crate::folder_scan::FolderScans::default(),
             mode: RwLock::new(mode),
             collectors,
             dns_visible,
@@ -148,6 +150,7 @@ pub fn summarize(a: &AlertRecord) -> AlertSummary {
         action: a.verdict.action,
         explanation: a.verdict.reasons.join(" "),
         resolved: a.status == whohack_core::store::AlertStatus::Resolved,
+        downloaded_files: Vec::new(),
     }
 }
 
@@ -262,6 +265,14 @@ impl Handler for ServiceHandler {
             None
         };
         match request {
+            Request::FolderScanStatus => reply(self.state.folder_scans.status()),
+            Request::StartFolderScan { path, remediate } => {
+                if self.state.integrity_issues.read().map_or(true, |v| !v.is_empty()) {
+                    return Response::Error { message: "Folder checks are unavailable while integrity checks report issues".into() };
+                }
+                reply(self.state.folder_scans.start(path, remediate, self.pushes.clone()))
+            }
+            Request::StopFolderScan { id } => reply(self.state.folder_scans.stop(id)),
             Request::DecisionDetails { alert_id } => reply(self.with_store(|s| {
                 s.decisions_for_alert(alert_id)?.into_iter().take(20).map(|d| serde_json::to_value(d).map_err(Into::into)).collect::<Result<Vec<_>, whohack_core::StoreError>>()
             }).map(|records| Response::Decisions { records })),
@@ -271,6 +282,8 @@ impl Handler for ServiceHandler {
                     self.with_store(|s| s.open_alerts())
                         .map(|open| Response::Status {
                             status: Box::new(StatusInfo {
+                                download_activity_available: true,
+                                folder_scan_available: self.state.folder_scans.available(),
                                 service_version: env!("CARGO_PKG_VERSION").into(),
                                 service_pid: std::process::id(),
                                 mode: self.state.mode(),
@@ -310,12 +323,37 @@ impl Handler for ServiceHandler {
                         }),
                 )
             }
-            Request::ListAlerts { limit } => reply(
-                self.with_store(|s| s.recent_alerts(limit.min(1000)))
-                    .map(|alerts| Response::Alerts {
-                        alerts: alerts.iter().map(summarize).collect(),
-                    }),
-            ),
+            Request::ListAlerts { limit } => reply(self.with_store(|s| {
+                let mut alerts = Vec::new();
+                for a in s.recent_alerts(limit.min(200))? {
+                    let mut summary = summarize(&a);
+                    if let Some(target) = s.alert_target(a.id)? {
+                        summary.app_name = target.exe.path.rsplit(['/', '\\']).next()
+                            .unwrap_or(&target.exe.path).to_owned();
+                        summary.downloaded_files = crate::download_view::files(&target);
+                        summary.downloaded_files.truncate(2);
+                    }
+                    alerts.push(summary);
+                }
+                Ok(Response::Alerts { alerts })
+            })),
+            Request::ListDownloads { limit } => reply(self.with_store(|s| {
+                Ok(Response::Downloads {
+                    downloads: s.recent_download_activity(limit)?.into_iter().map(|row| {
+                        whohack_ipc::DownloadSummary {
+                            files: crate::download_view::files(&row.process),
+                            pid: row.process.pid, start_time: row.process.start_time,
+                            app: crate::download_view::display_text(&row.process.exe.path),
+                            exit_time: row.exit_time,
+                            events: row.events.iter().map(|e| {
+                                let mut summary = summarize_event(e);
+                                summary.detail = crate::download_view::display_text(&summary.detail);
+                                summary
+                            }).collect(),
+                        }
+                    }).collect(),
+                })
+            })),
             Request::Resolve {
                 alert_id,
                 action,
@@ -484,6 +522,36 @@ mod tests {
             state,
             rx,
         )
+    }
+
+    #[test]
+    fn folder_scan_status_and_failures_do_not_create_process_alerts() {
+        let (h, state, mut rx) = handler();
+        assert!(matches!(
+            h.handle(Request::FolderScanStatus),
+            Response::FolderScan { scan: None, .. }
+        ));
+        assert!(matches!(
+            h.handle(Request::StartFolderScan {
+                path: "relative".into(),
+                remediate: false
+            }),
+            Response::Error { .. }
+        ));
+        assert!(matches!(
+            h.handle(Request::StopFolderScan { id: 99 }),
+            Response::Error { .. }
+        ));
+        state
+            .integrity_issues
+            .write()
+            .unwrap()
+            .push("fixture changed".into());
+        assert!(
+            matches!(h.handle(Request::StartFolderScan { path: "relative".into(), remediate: true }), Response::Error { message } if message.contains("integrity"))
+        );
+        assert!(h.store.lock().unwrap().open_alerts().unwrap().is_empty());
+        assert!(rx.try_recv().is_err());
     }
 
     #[test]

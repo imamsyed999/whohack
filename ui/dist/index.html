@@ -3,77 +3,118 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <title>whohack</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div class="brand">whohack</div>
-    <div id="conn" class="pill pill-bad" title="Connection to the whohack service">Connecting…</div>
-    <label class="mode">Mode
-      <select id="mode">
-        <option value="monitor">Monitor only</option>
-        <option value="prompt" disabled>Prompt before stronger actions</option>
-        <option value="auto" disabled>Automatic response</option>
-      </select>
-    </label>
-  </header>
-
-  <nav>
-    <button data-tab="alerts" class="active">Alerts <span id="alert-count" class="count"></span></button>
-    <button data-tab="timeline">Timeline</button>
-    <button data-tab="allowlist">Trusted</button>
-    <button data-tab="profiles">App profiles</button>
-    <button data-tab="responses">Responses &amp; quarantine</button>
-    <button data-tab="status">Status</button>
-  </nav>
-
-  <main>
-    <section id="tab-alerts" class="tab active">
-      <p id="response-mode-note" class="empty">whohack records activity and raises alerts.</p>
-      <p id="alerts-empty" class="empty">No recorded alerts.</p>
-      <div id="alerts"></div>
-    </section>
-
-    <section id="tab-timeline" class="tab">
-      <table>
-        <thead><tr><th>Time</th><th>PID</th><th>Event</th><th>Details</th></tr></thead>
-        <tbody id="timeline"></tbody>
-      </table>
-    </section>
-
-    <section id="tab-allowlist" class="tab">
-      <form id="allow-form">
-        <input id="allow-dest" placeholder="Trust a destination (IP, network, or domain)" required>
-        <button type="submit">Add</button>
-      </form>
-      <table>
-        <thead><tr><th>Kind</th><th>App</th><th>Value</th><th></th></tr></thead>
-        <tbody id="allowlist"></tbody>
-      </table>
-    </section>
-
-    <section id="tab-status" class="tab">
-      <dl id="status"></dl>
-    </section>
-
-    <section id="tab-responses" class="tab">
-      <p class="empty">Review actions taken by whohack. Releasing a block or suspension restores access. Restoring a quarantined file never runs it.</p>
-      <div id="responses"></div>
-      <h2>Quarantined files</h2>
-      <div id="quarantine"></div>
-    </section>
-
-    <section id="tab-profiles" class="tab">
-      <p class="empty">Choose each app's category to compare its observed behavior. Observed behavior is never automatically trusted.</p>
-      <table>
-        <thead><tr><th>App</th><th>Category</th><th>Observed capabilities</th></tr></thead>
-        <tbody id="profiles"></tbody>
-      </table>
-    </section>
-  </main>
-
-  <div id="toast" class="toast hidden"></div>
+  <aside class="sidebar">
+    <a class="brand" href="#downloads" aria-label="whohack home">
+      <svg viewBox="0 0 32 36" width="28" height="32" aria-hidden="true"><path d="M16 2 29 7v11c0 8-13 16-13 16S3 26 3 18V7Z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="m10 17 4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      whohack
+    </a>
+    <p class="brand-caption">Downloaded-file protection</p>
+    <nav aria-label="Main navigation">
+      <button data-tab="downloads" class="active" aria-pressed="true"><span aria-hidden="true">↓</span> Download activity</button>
+      <button data-tab="alerts" aria-pressed="false"><span aria-hidden="true">!</span> Alerts <span id="alert-count" class="count"></span></button>
+      <button data-tab="responses" aria-pressed="false"><span aria-hidden="true">◇</span> Actions &amp; files</button>
+      <button data-tab="status" aria-pressed="false"><span aria-hidden="true">⚙</span> Protection settings</button>
+      <div class="nav-label">More detail</div>
+      <button data-tab="folders" aria-pressed="false">Folder scan (optional)</button>
+      <button data-tab="timeline" aria-pressed="false">Activity log</button>
+      <button data-tab="profiles" aria-pressed="false">App profiles</button>
+      <button data-tab="allowlist" aria-pressed="false">Trusted items</button>
+    </nav>
+    <div class="sidebar-foot"><span class="local-dot"></span> Activity stays on this device<p>whohack does not upload files. Optional Defender checks follow Windows cloud settings.</p></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <span id="page-title">Download activity</span>
+      <div id="conn" class="pill pill-warn" role="status">Connecting…</div>
+    </header>
+    <main>
+      <div id="connection-warning" class="notice warning hidden" role="status"></div>
+      <section id="tab-downloads" class="tab active" aria-label="Download activity">
+        <div class="hero">
+          <div class="eyebrow">AFTER YOU DOWNLOAD</div>
+          <h1>Know what happens<br>when you open a file.</h1>
+          <p>Play a video, listen to audio, or run an app as usual. whohack watches the activity of the app that opens it and reports signs of danger.</p>
+          <button data-open-tab="alerts" class="primary">Review alerts <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="health-grid">
+          <div class="health-card"><span class="eyebrow">FILE TRACKING</span><strong id="tracking-value">Checking…</strong><p id="tracking-detail">Waiting for the Windows service.</p></div>
+          <div class="health-card"><span class="eyebrow">DANGER RESPONSE</span><strong id="response-value">Checking…</strong><p id="response-detail">Waiting for the response settings.</p></div>
+          <div class="health-card"><span class="eyebrow">NEEDS YOUR REVIEW</span><strong id="review-value">—</strong><p>Alerts are observations to review, not proof of a hacker.</p></div>
+        </div>
+        <div class="section-head"><div><h2>Recently opened downloads</h2><p>Up to 20 observed apps. Updates every 5 seconds.</p></div><button id="refresh-downloads">Refresh</button></div>
+        <div id="downloads-message" class="notice" role="status">Loading recorded activity…</div>
+        <div id="downloads"></div>
+        <div class="how-it-works">
+          <div><b>1. Download</b><p>Save a file as you normally would.</p></div>
+          <div><b>2. Open or play</b><p>whohack links supported file opens to their apps.</p></div>
+          <div><b>3. Review &amp; act</b><p>Strong danger signals can pause the app. You review what happened.</p></div>
+        </div>
+        <p class="footnote">A new connection alone is not a threat. Recorded activity is not a safety certificate; sensor coverage and retained history are limited.</p>
+      </section>
+      <section id="tab-alerts" class="tab" aria-label="Alerts">
+        <div class="section-head"><div><h1>Alerts to review</h1><p>See what was detected, then choose what happens next.</p></div></div>
+        <p id="response-mode-note" class="notice">Checking response settings…</p>
+        <label class="filter"><input type="checkbox" id="show-resolved"> Include reviewed alerts</label>
+        <p id="alerts-empty" class="empty">Loading alerts…</p>
+        <div id="alerts"></div>
+      </section>
+      <section id="tab-responses" class="tab" aria-label="Actions and files">
+        <h1>Actions &amp; files</h1>
+        <p class="intro">See what whohack actually did. A quarantined file is stored safely out of use; restoring it does not run it.</p>
+        <h2>Response history</h2><div id="responses"></div>
+        <h2>Quarantined files</h2><div id="quarantine"></div>
+      </section>
+      <section id="tab-status" class="tab" aria-label="Protection settings">
+        <h1>Protection settings</h1>
+        <div class="panel">
+          <label class="mode" for="mode">When danger is detected
+            <select id="mode" disabled>
+              <option value="monitor">Notify only</option>
+              <option value="prompt" disabled>Pause qualified danger; ask before removal</option>
+              <option value="auto" disabled>Automatic response</option>
+            </select>
+          </label>
+          <p id="settings-response-note">Waiting for the service.</p>
+          <p class="footnote">Download pause needs to be enabled in the service. Notify only releases existing whohack blocks and pauses. Automatic response is available only when separately enabled.</p>
+        </div>
+        <h2>Service &amp; sensor details</h2>
+        <dl id="status"></dl>
+      </section>
+      <section id="tab-timeline" class="tab" aria-label="Activity log">
+        <h1>Activity log</h1><p class="intro">Recent observations across apps. PID is the Windows process number.</p>
+        <div class="table-wrap"><table><thead><tr><th>Time</th><th>PID</th><th>Activity</th><th>Details</th></tr></thead><tbody id="timeline"></tbody></table></div>
+      </section>
+      <section id="tab-folders" class="tab" aria-label="Optional folder scan">
+        <h1>Scan a folder</h1>
+        <p class="intro">Optionally ask installed Microsoft Defender to inspect a folder and its contents. Live protection still watches the downloaded files you open or run.</p>
+        <form id="folder-form">
+          <label for="folder-path">Local folder path</label>
+          <div class="form-row"><input id="folder-path" placeholder="C:\Users\you\Downloads" required maxlength="4096"><button id="folder-submit" type="submit" disabled>Scan folder</button></div>
+          <label class="filter"><input type="checkbox" id="folder-remediate"> Allow Defender to quarantine or remove detected threats in this folder</label>
+        </form>
+        <p id="folder-status" class="notice" role="status">Waiting for the service.</p>
+        <button id="folder-stop" type="button" class="hidden" disabled>Stop scan client</button>
+        <p id="folder-limitation" class="footnote">Checks report detections by default. Defender uses your Windows cloud protection and sample submission settings. No matches is not a safety verdict. Stopping the client may leave work already submitted to Defender running.</p>
+        <div id="folder-results"></div>
+      </section>
+      <section id="tab-allowlist" class="tab" aria-label="Trusted items">
+        <h1>Trusted items</h1><p class="notice warning">Trust suppresses matching alerts. Only add an app or destination you recognize and intend to exclude.</p>
+        <form id="allow-form"><label for="allow-dest">Destination to trust</label><div class="form-row"><input id="allow-dest" placeholder="IP address, network, or domain" required><button type="submit">Add trusted item</button></div></form>
+        <div class="table-wrap"><table><thead><tr><th>Kind</th><th>App</th><th>Value</th><th>Action</th></tr></thead><tbody id="allowlist"></tbody></table></div>
+      </section>
+      <section id="tab-profiles" class="tab" aria-label="App profiles">
+        <h1>App profiles</h1><p class="intro">An app's category helps compare its behavior. Observed behavior is never automatically trusted.</p>
+        <div class="table-wrap"><table><thead><tr><th>App</th><th>Category</th><th>Observed capabilities</th></tr></thead><tbody id="profiles"></tbody></table></div>
+      </section>
+    </main>
+    <footer>whohack <span id="version"></span><span id="last-updated">Waiting for service</span></footer>
+  </div>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
 </body>
 </html>

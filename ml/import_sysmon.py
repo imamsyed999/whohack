@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import hashlib
 import ipaddress
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import subprocess
 import xml.etree.ElementTree as ET
@@ -111,7 +111,7 @@ def provisional_labels(state):
         tactic = 'credential_theft'
     elif re.search(r'^PERSIST (?!none)', state, re.M):
         tactic = 'persistence'
-    elif 'evasion:process_injection' in state or 'injection' in state:
+    elif 'injection:remote_thread' in state:
         tactic = 'none'
     else:
         return None
@@ -119,17 +119,48 @@ def provisional_labels(state):
                 severity='2', action='ask_user')
 
 
+def validate_acquisition(acquisition):
+    """Reject unsafe or ambiguous local namespaces before writing fixtures."""
+    if (acquisition.get('repository') != 'splunk/attack_data'
+            or not re.fullmatch(r'[0-9a-f]{40}', acquisition.get('revision', ''))
+            or acquisition.get('license') != 'Apache-2.0'):
+        raise ValueError('unsupported acquisition provenance')
+    families, files, paths = set(), set(), set()
+    for entry in acquisition['files']:
+        family, file = entry['family'], entry['file']
+        if (not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,127}', family)
+                or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,199}\.log', file)
+                or PureWindowsPath(family + '.jsonl').is_reserved()
+                or PureWindowsPath(file).is_reserved()
+                or '..' in Path(entry['source_path']).parts
+                or not re.fullmatch(r'datasets/(?:malware|attack_techniques)/[A-Za-z0-9_./-]+\.log', entry['source_path'])):
+            raise ValueError('unsafe acquisition filename or source path')
+        if (family.lower() in families or file.lower() in files or entry['source_path'].lower() in paths):
+            raise ValueError('ambiguous acquisition namespace')
+        if (type(entry['bytes']) is not int or not 0 < entry['bytes'] <= 30_000_000
+                or not re.fullmatch(r'[0-9a-f]{64}', entry['sha256'])):
+            raise ValueError('invalid acquisition size or digest')
+        families.add(family.lower())
+        files.add(file.lower())
+        paths.add(entry['source_path'].lower())
+
+
 def build(source, service, output):
     if output.exists():
         raise ValueError('use a new output directory')
     acquisition = json.loads((source / 'acquisition.json').read_text())
+    validate_acquisition(acquisition)
     if json.loads(subprocess.check_output([str(service), '--model-contract'], text=True)) != CONTRACT:
         raise ValueError('serving contract mismatch')
     output.mkdir(parents=True)
     rows, counts, selected, total_windows = [], Counter(), Counter(), 0
+    source_reports, all_states = [], set()
     for entry in acquisition['files']:
-        path = source / entry['file']
-        if sha256(path) != entry['sha256']:
+        selected[entry['family']] = 0
+        path = (source / entry['file']).resolve()
+        if not path.is_relative_to(source.resolve()):
+            raise ValueError('source file escapes acquisition directory')
+        if path.stat().st_size != entry['bytes'] or sha256(path) != entry['sha256']:
             raise ValueError('source digest mismatch')
         processes = defaultdict(list)
         for line in path.open(encoding='utf-8-sig'):
@@ -146,9 +177,10 @@ def build(source, service, output):
             guid = data.get('SourceProcessGUID', data.get('SourceProcessGuid')) if number in (8, 10) else data.get('ProcessGuid', data.get('ProcessGUID'))
             image = data.get('SourceImage') if number in (8, 10) else data.get('Image')
             if not guid or not image:
+                counts['without_process_identity'] += 1
                 continue
             processes[(guid.lower(), normal_path(image))].append((number, data))
-        records, ends = [], []
+        records, ends = [], {}
         for ordinal, ((guid, path_name), events) in enumerate(sorted(processes.items())):
             events.sort(key=lambda pair: pair[1]['_ts'])
             start = next((d for n, d in events if n == 1), None)
@@ -171,7 +203,7 @@ def build(source, service, output):
             process = dict(pid=pid, ppid=0, start_time=stamp, exe=file, script=None,
                            path_class='other', tainted=False, taint_root=None,
                            app_id=identity, downloaded_inputs=[])
-            dns, last_bucket, last_index = {}, None, None
+            dns, last_bucket, last_index, immediate_types = {}, None, None, set()
             for number, data in events:
                 try:
                     kind = observed_kind(number, data, dns)
@@ -185,30 +217,55 @@ def build(source, service, output):
                     kind['ppid'] = 0
                 bucket = data['_ts'] // 60_000
                 if last_bucket is not None and bucket != last_bucket:
-                    ends.append((last_index, identity, process_digest is not None))
+                    ends[last_index] = (identity, process_digest is not None)
+                    immediate_types.clear()
                 records.append(dict(event=dict(ts=data['_ts'], pid=pid, kind=kind), process=process))
                 last_index, last_bucket = len(records) - 1, bucket
+                # Keep the first newly observed concerning behavior in each
+                # minute as well as the minute endpoint. This preserves early
+                # response examples without adding a label to quiet windows.
+                signal = kind['type'] if kind['type'] in ('persistence', 'injection') else (
+                    'lsass_handle_read_permission' if kind.get('class') == 'lsass' else None)
+                if signal and signal not in immediate_types:
+                    ends[last_index] = (identity, process_digest is not None)
+                    immediate_types.add(signal)
             if last_index is not None:
-                ends.append((last_index, identity, process_digest is not None))
+                ends[last_index] = (identity, process_digest is not None)
         if not records:
-            selected[entry['family']] = 0
+            source_reports.append(dict(source_path=entry['source_path'], source_sha256=entry['sha256'],
+                                       candidates=0, selected=0, unlabeled=0, duplicate_states=0))
             continue
         fixture = output / (entry['family'] + '.jsonl')
         write_jsonl(fixture, records)
-        run = subprocess.run([str(service), '--replay', str(fixture), '--category', 'other'],
-                             capture_output=True, text=True, check=True, timeout=180)
-        replay = [json.loads(line) for line in run.stdout.splitlines()]
-        if len(replay) != len(records):
+        fixture_digest = sha256(fixture)
+        # Replay can expand a small source log substantially. Keep its output on
+        # disk and retain only requested windows, rather than all model states.
+        replay_path = output / 'replay-working.jsonl'
+        with replay_path.open('wb') as replay_file:
+            subprocess.run([str(service), '--replay', str(fixture), '--category', 'other'],
+                           stdout=replay_file, stderr=subprocess.PIPE, check=True, timeout=180)
+        replay, replay_count = {}, 0
+        with replay_path.open(encoding='utf-8') as replay_file:
+            for index, line in enumerate(replay_file):
+                replay_count += 1
+                if index in ends:
+                    replay[index] = json.loads(line)
+        replay_path.unlink()
+        if replay_count != len(records):
             raise ValueError('replay output count mismatch')
-        seen = set()
-        for index, identity, verified in ends:
+        unlabeled, duplicates = 0, 0
+        for index, (identity, verified) in sorted(ends.items()):
             total_windows += 1
             result = replay[index]
             state = result.get('state')
             labels = provisional_labels(state) if state else None
-            if not labels or state in seen:
+            if not labels:
+                unlabeled += 1
                 continue
-            seen.add(state)
+            if state in all_states:
+                duplicates += 1
+                continue
+            all_states.add(state)
             # Public traces are weak-label training data ONLY. No accuracy claim
             # uses them as a trusted holdout; shared background binaries cannot
             # accidentally cross from training into a public test partition.
@@ -218,18 +275,28 @@ def build(source, service, output):
                              labels=labels, source='Splunk attack_data; provisional evidence labels',
                              family='splunk:' + entry['family'], app_sha256=identity,
                              identity_is_recorded_image_hash=verified,
-                             fixture_sha256=sha256(fixture), source_sha256=entry['sha256'],
+                             fixture_sha256=fixture_digest, source_sha256=entry['sha256'],
                              source_revision=acquisition['revision'], source_path=entry['source_path'],
+                             source_repository=acquisition['repository'], source_license=acquisition['license'],
+                             source_context=entry.get('source_context', 'public lab trace; includes background processes'),
+                             source_technique=entry.get('technique'), source_technique_is_label=False,
                              source_event_index=index, scorer=result['scorer'], replay_config_sha256=None,
                              split='train', validation_role=None, synthetic=False,
                              label_quality='weak_observable_behavior', review=dict(accepted=False),
                              missing_fields=['signature (unsigned placeholder)', 'download origin',
                                              'network byte counts', 'verified start time when absent']))
             selected[entry['family']] += 1
+        source_reports.append(dict(source_path=entry['source_path'], source_sha256=entry['sha256'],
+                                   candidates=len(ends), selected=selected[entry['family']],
+                                   unlabeled=unlabeled, duplicate_states=duplicates))
         print('Imported', entry['family'], selected[entry['family']], 'provisional cases', flush=True)
     validate(rows)
     write_jsonl(output / 'dataset.jsonl', rows)
     report = dict(cases=len(rows), observed_windows=total_windows, families=dict(selected), events=dict(counts),
+                  sources=len(acquisition['files']), sources_with_selected_cases=sum(v > 0 for v in selected.values()),
+                  skipped_unlabeled_windows=sum(s['unlabeled'] for s in source_reports),
+                  skipped_duplicate_states=sum(s['duplicate_states'] for s in source_reports),
+                  label_counts=dict(Counter(r['labels']['tactic'] for r in rows)), source_reports=source_reports,
                   acquisition_sha256=sha256(source / 'acquisition.json'), importer_sha256=sha256(Path(__file__)),
                   service_sha256=sha256(service), dataset_sha256=sha256(output / 'dataset.jsonl'),
                   reviewed_cases=0, license='Apache-2.0', qualified=False,
@@ -237,6 +304,9 @@ def build(source, service, output):
                                'Other windows remain unlabeled; no clean verdict inferred from missing signals.',
                                'Sysmon source visibility differs from native ETW; import does not add sensors.',
                                'Unknown signatures use the existing unsigned schema placeholder.',
+                               'LSASS handle memory-read permission does not establish that memory was read.',
+                               'File creation is not proof of encryption; raw IP or script execution alone is not labeled malicious.',
+                               'Candidate windows include first concerning events and minute endpoints; rows are correlated.',
                                'Process paths anonymized; no commands, binaries or network connections executed.'])
     (output / 'provenance.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report, indent=2))

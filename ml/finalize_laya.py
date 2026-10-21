@@ -50,13 +50,18 @@ def finalize(args):
     import torch
     from laya.train import calibration_records, items_from_rows, load_checkpoint
     from safetensors.torch import load_file
-    guard = ResourceGuard(args.output, Budget(max_seconds=1200))
+    if args.gpu_telemetry == 'nvml':
+        worker = Path(__file__).with_name('nvml_telemetry.py')
+        (args.output / worker.name).write_bytes(worker.read_bytes())
+    guard = ResourceGuard(args.output, Budget(max_seconds=1200), telemetry_backend=args.gpu_telemetry)
     report = dict(status='starting', qualified=False, gradient_updates=0,
                   training_stopped=True, training_stop_reason=training['error'],
                   completed_epochs=len(training['history']), best_epoch=training['best_epoch'],
                   training_report_sha256=sha256(run / 'training-report.json'),
                   dataset_sha256=training['dataset_sha256'], base_acquisition=training['base_acquisition'],
-                  synthetic=any(r['synthetic'] for r in rows), automatic_response_enabled=False)
+                  synthetic=any(r['synthetic'] for r in rows), automatic_response_enabled=False,
+                  gpu_telemetry=args.gpu_telemetry,
+                  telemetry_worker_sha256=sha256(worker) if args.gpu_telemetry == 'nvml' else None)
     try:
         guard.start(torch)
         model, tokenizer, cfg = load_checkpoint(str(checkpoint))
@@ -153,4 +158,5 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     for name in ['run', 'dataset', 'parent', 'laya-overlay', 'output']:
         p.add_argument('--' + name, type=Path, required=True)
+    p.add_argument('--gpu-telemetry', choices=['nvidia-smi', 'nvml'], default='nvidia-smi')
     finalize(p.parse_args())

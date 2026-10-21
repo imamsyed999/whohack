@@ -7,6 +7,31 @@ use whohack_ipc::{AlertSummary, EventSummary, Request, Response, StatusInfo};
 use crate::conn::Conn;
 
 #[tauri::command]
+pub async fn downloads(conn: State<'_, Conn>) -> Result<Response, String> {
+    conn.call(Request::ListDownloads { limit: 20 }).await
+}
+
+#[tauri::command]
+pub async fn folder_scan_status(conn: State<'_, Conn>) -> Result<Response, String> {
+    conn.call(Request::FolderScanStatus).await
+}
+
+#[tauri::command]
+pub async fn start_folder_scan(
+    conn: State<'_, Conn>,
+    path: String,
+    remediate: bool,
+) -> Result<Response, String> {
+    conn.call(Request::StartFolderScan { path, remediate })
+        .await
+}
+
+#[tauri::command]
+pub async fn stop_folder_scan(conn: State<'_, Conn>, id: u64) -> Result<Response, String> {
+    conn.call(Request::StopFolderScan { id }).await
+}
+
+#[tauri::command]
 pub async fn decision_details(conn: State<'_, Conn>, alert_id: i64) -> Result<Response, String> {
     conn.call(Request::DecisionDetails { alert_id }).await
 }

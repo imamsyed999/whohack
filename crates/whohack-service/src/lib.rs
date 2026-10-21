@@ -5,6 +5,8 @@ pub mod admin;
 pub mod alerts;
 pub mod cli;
 pub mod decisions;
+mod download_view;
+mod folder_scan;
 pub mod integrity;
 pub mod ipc_handler;
 pub mod logging;

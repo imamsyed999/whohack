@@ -4,6 +4,7 @@ import math
 import os
 import shutil
 import subprocess
+import sys
 import threading
 import time
 from dataclasses import asdict, dataclass
@@ -70,7 +71,10 @@ class NvidiaTelemetry:
     alive avoids repeatedly initializing its driver client during CUDA work.
     https://docs.nvidia.com/deploy/nvidia-smi/index.html
     """
-    def __init__(self):
+    def __init__(self, backend='nvidia-smi'):
+        if backend not in ('nvidia-smi', 'nvml'):
+            raise ValueError('unknown GPU telemetry backend')
+        self.backend = backend
         self.process = None
         self.ready = threading.Event()
         self.last = None
@@ -78,18 +82,23 @@ class NvidiaTelemetry:
         self.thread = None
 
     def start(self):
-        self.process = subprocess.Popen([
+        command = [
             'nvidia-smi', '--id=0', '--query-gpu=memory.used,temperature.gpu',
             '--format=csv,noheader,nounits', '--loop-ms=1000',
-        ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,
+        ]
+        if self.backend == 'nvml':
+            # The base interpreter avoids a Windows venv launcher child, so the
+            # exact owned telemetry process can always be terminated on close.
+            python = Path(sys._base_executable).resolve(strict=True)
+            worker = Path(__file__).with_name('nvml_telemetry.py').resolve(strict=True)
+            command = [str(python), '-I', '-u', str(worker)]
+        self.process = subprocess.Popen(command,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1,
             creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
         def reader():
             try:
                 for line in self.process.stdout:
-                    used, temperature = [float(value.strip()) for value in line.strip().split(',')]
-                    if not all(math.isfinite(v) and v >= 0 for v in (used, temperature)):
-                        raise ValueError('invalid GPU sample')
-                    self.last = (time.monotonic(), used * 1024**2, temperature)
+                    self.accept(line)
                     self.ready.set()
             except Exception as exc:
                 self.error = type(exc).__name__
@@ -97,6 +106,21 @@ class NvidiaTelemetry:
         self.thread = threading.Thread(target=reader, daemon=True)
         self.thread.start()
         return self
+
+    def accept(self, line):
+        received = time.monotonic()
+        values = [float(value.strip()) for value in line.strip().split(',')]
+        if self.backend == 'nvml':
+            stamp, used, temperature = values
+            if (not math.isfinite(stamp) or stamp < 0 or stamp > received
+                    or received - stamp > 8 or self.last and stamp <= self.last[0]):
+                raise ValueError('stale, invalid or nonadvancing source GPU timestamp')
+        else:
+            used, temperature = values
+            stamp = received
+        if not all(math.isfinite(v) and v >= 0 for v in (used, temperature)):
+            raise ValueError('invalid GPU sample')
+        self.last = (stamp, used * 1024**2, temperature)
 
     def sample(self):
         if not self.ready.wait(8) or self.error or self.process.poll() is not None or self.last is None:
@@ -132,9 +156,17 @@ class ResourceGuard:
     A different application can allocate memory between samples: this is not a
     system-wide VRAM reservation or a guarantee against every driver failure.
     """
-    def __init__(self, output, budget):
+    def __init__(self, output, budget, forward_idle_seconds=.1, telemetry_backend='nvidia-smi'):
+        if (type(forward_idle_seconds) not in (int, float)
+                or not math.isfinite(forward_idle_seconds)
+                or not .05 <= forward_idle_seconds <= .5):
+            raise ValueError('forward idle must be between 50 and 500 milliseconds')
         self.output = Path(output)
         self.budget = budget.validate()
+        self.forward_idle_seconds = forward_idle_seconds
+        if telemetry_backend not in ('nvidia-smi', 'nvml'):
+            raise ValueError('unknown GPU telemetry backend')
+        self.telemetry_backend = telemetry_backend
         self.started = time.monotonic()
         self.stopped = threading.Event()
         self.reason = None
@@ -165,7 +197,9 @@ class ResourceGuard:
 
     def write_report(self):
         data = dict(budget=asdict(self.budget), stop_reason=self.reason,
-                    peaks=self.peaks, last=self.last, telemetry='nvidia-smi persistent 1-second stream; 8-second stale limit',
+                    peaks=self.peaks, last=self.last,
+                    telemetry=self.telemetry_backend + ' persistent 1-second stream; 8-second stale limit',
+                    forward_idle_seconds=self.forward_idle_seconds,
                     limitation='Allocator cap is per process; other apps allocate independently.')
         temp = self.output / 'resources.json.tmp'
         temp.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
@@ -181,16 +215,34 @@ class ResourceGuard:
             if self.reason:
                 # Forward hooks normally raise immediately. A hung kernel gets
                 # a grace period, then only this owned Python process exits.
-                self.write_report()
+                try:
+                    self.write_report()
+                except Exception:
+                    # Failed disk/report I/O must not disable the watchdog.
+                    pass
                 if not self.stopped.wait(15):
-                    if self.gpu:
-                        self.gpu.close()
-                    os._exit(75)
+                    try:
+                        if self.gpu:
+                            self.gpu.close()
+                    finally:
+                        # Worker cleanup can fail too. Only this owned trainer
+                        # exits; the emergency stop remains unconditional.
+                        os._exit(75)
                 return
 
     def check(self, *_):
         if self.reason:
             raise ResourceStop(self.reason)
+        # On this WDDM desktop sustained forward/backward submission coincided
+        # with NVIDIA query stalls despite a once-per-second cooperative yield.
+        # Drain prior work and leave a bounded idle interval before EVERY model
+        # forward. This reduces throughput; it never relaxes the stale-sample or
+        # memory limits. Hooks receive (module, args); explicit checks do not.
+        if _ and self.torch is not None:
+            self.torch.cuda.synchronize(0)
+            time.sleep(self.forward_idle_seconds)
+            if self.reason:
+                raise ResourceStop(self.reason)
         # Leave short idle intervals for the desktop and driver telemetry on
         # WDDM. Never continue issuing work while a sample is getting stale.
         if self.torch is not None and time.monotonic() >= self.next_yield:
@@ -210,7 +262,7 @@ class ResourceGuard:
 
     def start(self, torch):
         import psutil
-        self.gpu = NvidiaTelemetry().start()
+        self.gpu = NvidiaTelemetry(self.telemetry_backend).start()
         self.gpu.sample()  # Verify monitoring before any training CUDA allocation.
         if not torch.cuda.is_available():
             raise ResourceStop('CUDA is required for this bounded training job')

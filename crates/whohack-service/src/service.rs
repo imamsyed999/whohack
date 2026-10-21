@@ -315,6 +315,7 @@ impl Running {
         if let Some(ipc) = self.ipc {
             ipc.abort();
         }
+        self.state.folder_scans.shutdown();
         let published = self.pipeline.shutdown().await;
         drop(self.bus);
         let _ = self.counter.await;

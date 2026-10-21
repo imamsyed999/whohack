@@ -98,6 +98,8 @@ def wait_for(predicate, message, timeout=20):
 
 def exercise(service, fixture, report, automatic_download=False, input_extension="mp4", native_reads=False, network_danger=False):
     report.update(service_sha256=digest(service), fixture_sha256=digest(fixture))
+    require(b"WHOHACK_TEST_HEARTBEAT" in fixture.read_bytes(),
+            "This helper predates the whohack rename. Use a current whohack_respond test executable.")
     with tempfile.TemporaryDirectory(prefix="whohack detection acceptance ") as directory:
         root = Path(directory)
         config, marker = root / "config.toml", root / "session"
@@ -280,6 +282,15 @@ def exercise(service, fixture, report, automatic_download=False, input_extension
                     require(inputs[0]["file"]["sha256"] == report["fixture_content_sha256"] and captured["tainted"],
                             "Download hash/origin missing")
                     require(inputs[0]["read_observed"] == native_reads, "Wrong launch/read attribution evidence")
+                    if status.get("download_activity_available"):
+                        activity = ipc("list_downloads", limit=20)
+                        require(activity["kind"] == "downloads", "Download activity API failed")
+                        row = next((r for r in activity["downloads"]
+                                    if r["pid"] == target.pid and r["start_time"] == captured["start_time"]), None)
+                        require(row and any(Path(f["path"]).resolve() == target_input.resolve()
+                                            and f["evidence"] == ("observed_read" if native_reads else "launch_argument")
+                                            for f in row["files"]), "Activity view lost the exact input association")
+                        report["checks"].append("authenticated download activity exposes the owned file and attribution evidence")
                     require(alert["action"] == "suspend_and_ask", "Qualified download evidence did not automatically pause")
                     require(not any(a["pid"] == control.pid for a in ipc("list_alerts", limit=1000)["alerts"]),
                             "Clean downloaded content generated an alert")

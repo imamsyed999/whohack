@@ -58,6 +58,14 @@ async fn push_loop(app: AppHandle, settings: Settings) {
                                 .body(&alert.explanation)
                                 .show();
                         }
+                        if let PushEvent::FolderScanFinished { message, .. } = &event {
+                            let _ = app
+                                .notification()
+                                .builder()
+                                .title("whohack folder check")
+                                .body(message)
+                                .show();
+                        }
                         let _ = app.emit("whohack://push", &event);
                     }
                 }
@@ -115,6 +123,10 @@ fn main() {
         .manage(Conn::new(settings.clone()))
         .invoke_handler(tauri::generate_handler![
             commands::status,
+            commands::downloads,
+            commands::folder_scan_status,
+            commands::start_folder_scan,
+            commands::stop_folder_scan,
             commands::alerts,
             commands::decision_details,
             commands::events,

@@ -1,0 +1,1115 @@
+{
+  "schema_version": 2,
+  "repository": "splunk/attack_data",
+  "revision": "aafa53ea228fbab8d9ac3e33c9275fab2136909d",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "path": "datasets/malware/agent_tesla/agent_tesla_ftp/sysmon.log",
+      "bytes": 11691422,
+      "sha256": "e34b4663372fc5456336052615813f0d0bdb2572d7eed9a326acec45c186c016",
+      "family": "malware-agent_tesla",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/amadey/access_permission/amadey_sysmon2.log",
+      "bytes": 98786,
+      "sha256": "1e11d6c9114dab7560e603249b74e6c71ccd6b1855c8e4f4e271f8efdce6dce6",
+      "family": "malware-amadey",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/dcrat/dcrat_delay_execution/sysmon.log",
+      "bytes": 3111533,
+      "sha256": "5b0ef47a054421cfb1628485f145640362ed51ff85754abea13a75966689e54f",
+      "family": "malware-dcrat",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/doublezero_wiper/sysmon.log",
+      "bytes": 18964977,
+      "sha256": "1bd8899303f5fca2f3d99f310ee27e0e670d89a5643c06805558353c3190b522",
+      "family": "malware-doublezero_wiper",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/fin7/fin7_js_2/ldap_module_loaded_sysmon.log",
+      "bytes": 4518,
+      "sha256": "00eda0add67ea969fb91b56df0405e083aa1e755ff4bab90f7a259d25612b689",
+      "family": "malware-fin7",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/gootloader/partial_ttps/windows-sysmon.log",
+      "bytes": 22927,
+      "sha256": "8264e3fa99527d694905bf7c9921cb2b18d15d152f6c959a902af65b8a4d2d79",
+      "family": "malware-gootloader",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/hermetic_wiper/globalfolderoptions_reg/sysmon.log",
+      "bytes": 6298056,
+      "sha256": "d46cd328c9aaa82a9df797ca56d037a8c19572f90a0c9cb6b0a37c5f6c834034",
+      "family": "malware-hermetic_wiper",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/icedid/cmd_carry_str_param/sysmon.log",
+      "bytes": 3292157,
+      "sha256": "6cec51c32bef2dc0eca57ca619a2e7017c43dcad88658adb588dedf5676abbbb",
+      "family": "malware-icedid",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/industroyer2/sysmon.log",
+      "bytes": 13670633,
+      "sha256": "55368573e681f2e980f93ccd22d10a6e437f89854b3f6bddbae8992bd37b6c98",
+      "family": "malware-industroyer2",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/lockbit_ransomware/sysmon.log",
+      "bytes": 16706353,
+      "sha256": "7b8265b968d100892fa3ed597c099dd772425e7f16d4ffe66a0cfed12f2d40bd",
+      "family": "malware-lockbit_ransomware",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/notdoor/disable_dialogs/windows-sysmon.log",
+      "bytes": 3633,
+      "sha256": "cc9a6bb62770ced26341092729f79f256b5a1a16d85b3fea2dd5c992fc0d190f",
+      "family": "malware-notdoor",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/redline/modify_registry/sysmon.log",
+      "bytes": 8845034,
+      "sha256": "91fa46d649011ce4ff9d814eec5bcee0f90da878d0967dce7d915b784f53d51a",
+      "family": "malware-redline",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/ryuk/windows-sysmon.log",
+      "bytes": 10925432,
+      "sha256": "2311ff4c481acdfc6a96ce77fd15abe47e4830b16a183384ce0c9841f8285bfa",
+      "family": "malware-ryuk",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/snakemalware/comadmin_windows-sysmon.log",
+      "bytes": 2301,
+      "sha256": "5a1cd9e6295dd7865794afc915a9067529eb3f29eae829f26892b20017b6f126",
+      "family": "malware-snakemalware",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/vilsel/sysmon.log",
+      "bytes": 7871198,
+      "sha256": "29f318a716934ee6fbf71f4970652a282f8fc00c2a3fc8c3f5c315206e333e79",
+      "family": "malware-vilsel",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/malware/winter-vivern/scheduledtask/sysmon.log",
+      "bytes": 14559792,
+      "sha256": "06df0ee0273af3cb01cc84c550b95a62260d5eb82820554a16d6efc9619cca95",
+      "family": "malware-winter-vivern",
+      "source_context": "malware lab trace; includes background activity"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.005/atomic_red_team/mshta_tasks_windows-sysmon.log",
+      "bytes": 1031,
+      "sha256": "a8f64b9d6ebb3e5d46be1c3cff44a820edc1ce65df5fbf0e75da22d157cbe243",
+      "family": "T1218.005-575d98996e3f",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1547.005/malicious_ssp/windows-sysmon.log",
+      "bytes": 1046,
+      "sha256": "5468577ff1e3b78f65c18d2b4643d2700204049fd3150815439dfc337be963de",
+      "family": "T1547.005-973deebafc7b",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1547.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1547.012/print_reg/sysmon_print.log",
+      "bytes": 1105,
+      "sha256": "fb716a8fa15b9a772c5750211faa75d8e72ed0ff2218d7be4fecce1c7cb58808",
+      "family": "T1547.012-99cd58639c7d",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1547.012"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.005/mshta_in_registry/sysmon3.log",
+      "bytes": 1131,
+      "sha256": "c73d69c9bf1bee5477f1fc1b1c5977ec37313912087dc04179b7afc6987a6dce",
+      "family": "T1218.005-7867593c8690",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059/suspiciously_named_executables/windows-sysmon.log",
+      "bytes": 1772,
+      "sha256": "0d22f7f0a6b0a25598928070de1e8901d7f1f140d975787f912286448ad8bcff",
+      "family": "T1059-86c96f2661d9",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059"
+    },
+    {
+      "path": "datasets/attack_techniques/T1036/msdtc_process_param/msdtc_a_sysmon.log",
+      "bytes": 1974,
+      "sha256": "0cb72dd5c48a3e435b7fe3500c46106891c30a212d13fce1cf5915b7b4953a92",
+      "family": "T1036-d6bad88a68c7",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1036"
+    },
+    {
+      "path": "datasets/attack_techniques/T1003/credential_extraction/mimikatzwindows-sysmon.log",
+      "bytes": 1990,
+      "sha256": "a414909e4bd23f96d8d1be73157a5c1bcb3d360a2db1949e81dc4cdb06b88879",
+      "family": "T1003-ad2222919966",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1490/shadowcopy_del/wmicshadowcopydelete_sysmon.log",
+      "bytes": 2004,
+      "sha256": "b943f1ca687118745fae96c11af10a07f8d91f7b34d6c24757579ee55ad539b7",
+      "family": "T1490-c6e32fd1ee5f",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1490"
+    },
+    {
+      "path": "datasets/attack_techniques/T1036/suspicious_process_path/susp_path_sysmon1.log",
+      "bytes": 2014,
+      "sha256": "e5d9dd394138305b60b75452ce71c2bcc508b8797e7e073267a1d431b141156b",
+      "family": "T1036-92163e4e24c5",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1036"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/powershell_remotesigned/remotesigned_sysmon.log",
+      "bytes": 2017,
+      "sha256": "a47baee10e74c0f675a26a9f3153a35109938a6570b9b75cb5047be03eea78c5",
+      "family": "T1059.001-fec6fb900da1",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1053.005/schtask_system/windows-sysmon.log",
+      "bytes": 2142,
+      "sha256": "598b761436a1a39b1561c3f0ce59cd8b0439601f4137c73aaf32a4f9bc35077e",
+      "family": "T1053.005-c3977eb6bdbf",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1053.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/atomic_red_team/captcha_windows-sysmon.log",
+      "bytes": 2153,
+      "sha256": "2349326b9042ba212dc16a4764a2cd1fbfa318a792c5591594b77bbfd20ddc9e",
+      "family": "T1059.001-4a0a51e133d2",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/atomic_red_team/enableat_windows-sysmon.log",
+      "bytes": 2285,
+      "sha256": "277289fa911c6c7999f338f735c29a9811d03249e8d9584ec722af85aa051ded",
+      "family": "T1059.001-e1da4b005465",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1071.004/kerberos_coercion/sysmon.log",
+      "bytes": 3344,
+      "sha256": "a2a1993d49ed6dc9be332d000d82a2162658315bcdce3eaedb59f180ad13538a",
+      "family": "T1071.004-d009fb6b37e3",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1071.004"
+    },
+    {
+      "path": "datasets/attack_techniques/T1543.003/atomic_red_team/remote_service_create_windows-sysmon.log",
+      "bytes": 4174,
+      "sha256": "2dd1965c9bc9390fabace178135420380be76452a3785661e5f7fbbb04bb2370",
+      "family": "T1543.003-801ce1018373",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1543.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1003.004/NoLMHash/lsa-reg-settings-sysmon.log",
+      "bytes": 4336,
+      "sha256": "8c8f63fb8ce8685f2b071f2249db601656036c21533601bcacd4ffb79ce7c894",
+      "family": "T1003.004-3809943b01be",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1003.004"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/unload_sysmon/windows-sysmon.log",
+      "bytes": 4685,
+      "sha256": "99ebf6dab3ce8d632929c39b92758c97c279003dada3600769f6bfb2700ed64e",
+      "family": "T1562.001-3fb13ac9bcf9",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.005/lotus_blossom_chrysalis/windows-sysmon.log",
+      "bytes": 4713,
+      "sha256": "cb5ea7112ec60ef8c6c4abfe3f2d5eccb0d7e8435e0da8ffdc7ff276878e7caf",
+      "family": "T1059.005-5b1a70e4661f",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.004/atomic_red_team/windows-sysmon_installutil_path.log",
+      "bytes": 6017,
+      "sha256": "d89cb0855915ab7ff36856ebf90a85e63f34f25b0a9b5116bdc87f4f69ab0231",
+      "family": "T1218.004-ff57c7e97639",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.004"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218/eviltwin/windows-sysmon.log",
+      "bytes": 6147,
+      "sha256": "f8fb1dbecd032334fde0464bd96abb51ffb23968068ea29a88618567adeaafb1",
+      "family": "T1218-e9ae178a39bb",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.008/atomic_red_team/windows-sysmon-odbc-regsvr.log",
+      "bytes": 6229,
+      "sha256": "3a6308c6ac99b548bc751ecf6a20edefd0e85779d03dbf27bc7ef56706752ac2",
+      "family": "T1218.008-8eb48826da00",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.008"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.004/njrat_add_firewall_rule/njrat_firewall_sysmon.log",
+      "bytes": 6361,
+      "sha256": "a29132ad684ab67c08287cac6dc72be207af125fb2efcc550c5ffb325123f490",
+      "family": "T1562.004-ad488e6eced8",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.004"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218/msix_ai_stubs/windows_sysmon.log",
+      "bytes": 6632,
+      "sha256": "55988e50871f111751e7c3b8f7f22014802f1008386f7b944e054b8ac9f1278e",
+      "family": "T1218-1defb8682c86",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/msix_powershell/windows-sysmon.log",
+      "bytes": 7346,
+      "sha256": "3f349b90eead3e2eda89bcc776b5f250f1ece2bd1a2c9d128ca79ad087d72e93",
+      "family": "T1059.001-82493de73178",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.008/atomic_red_team/windows-sysmon-odbc-rsp.log",
+      "bytes": 8110,
+      "sha256": "7a61afd1c025f97f07210d45ab77b9efe7b1885442a7af82df7ceaf0174c6a8f",
+      "family": "T1218.008-8ae0b91f9a48",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.008"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055/sliver/T1055_windows-sysmon.log",
+      "bytes": 8310,
+      "sha256": "1d689c147913ff7f81668a72d37de72c4448ddb3e9a675adaa766cdd1a7fbd6c",
+      "family": "T1055-60d29c65f9e1",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.013/atomic_red_team/windows-sysmon.log",
+      "bytes": 8370,
+      "sha256": "9233f7aa77cd5cdd1488838260bc2b3ea260d5747b04f285dbe686fe34241cd0",
+      "family": "T1218.013-785068dd1a02",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.013"
+    },
+    {
+      "path": "datasets/attack_techniques/T1048.003/cve-2023-23397/webdav_windows-sysmon.log",
+      "bytes": 9680,
+      "sha256": "30c3571061bf77f77fd40f523c402fbbda068ef71cc79a6485051fab933d2608",
+      "family": "T1048.003-e8f184681780",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1048.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.002/eventlog_sddl_tampering/eventlog_sddl_tampering_sysmon.log",
+      "bytes": 9790,
+      "sha256": "c8bef2025e86b90163af2f39deae955e879932536834216adb4e0e73f23e363d",
+      "family": "T1562.002-47f42bbdc622",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.002"
+    },
+    {
+      "path": "datasets/attack_techniques/T1546.003/atomic_red_team_wmi_subscription/sysmon.log",
+      "bytes": 9791,
+      "sha256": "7f66b34f1761618e97f20d0f9050ed7d2adff3fc6db700d97c6737533fd8856d",
+      "family": "T1546.003-88e78b8f788c",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1546.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.001/atomic_red_team/hh_decom_windows-sysmon.log",
+      "bytes": 10427,
+      "sha256": "1445c69416168a5f8cc0434da14fcb83458d54985d5d48064a9962cd0c4ed1d9",
+      "family": "T1218.001-237680bf6ae4",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1003.001/atomic_red_team/createdump_windows-sysmon.log",
+      "bytes": 10636,
+      "sha256": "b898327b2b446ba63c13934d50c899eb4b2ee2c722a7c6c4a1dae6c515720001",
+      "family": "T1003.001-55872f1394bb",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1003.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/encoded_powershell/padded_windows-sysmon.log",
+      "bytes": 11135,
+      "sha256": "0324ee4e5f2cb4c761e10862808c37a046097a2ad800d034490e3980c3e86dec",
+      "family": "T1059.001-e1b031477a81",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1547.008/atomic_red_team/windows-sysmon.log",
+      "bytes": 12006,
+      "sha256": "5ba1fd612063a04c6f91b5c32edc48a8472d335360c35f78210c36fee15b1527",
+      "family": "T1547.008-81cb4dbc68ab",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1547.008"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/encoded_powershell/explorer_spawns_windows-sysmon.log",
+      "bytes": 13142,
+      "sha256": "9200692ad74037b5234fe6f7da733d3e416b0ea8bb7f6d8ebb5bd16fc39b8b22",
+      "family": "T1059.001-681c756b8ba0",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1071.004/long_dns_query/dns-sysmon.log",
+      "bytes": 14344,
+      "sha256": "665351a29bf5545503fb572c808bf9ebf157e74ec6dcc8a098890551db6932ed",
+      "family": "T1071.004-99e064ea98f9",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1071.004"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055/msra/msra-windows-sysmon.log",
+      "bytes": 15812,
+      "sha256": "814f426f84e7a0f193d68828189e4d1691feed2005a4d70cc7b86ec2847cbe15",
+      "family": "T1055-fa5a6201548a",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218/diskshadow/windows-sysmon.log",
+      "bytes": 15897,
+      "sha256": "ce01372dbaa1eb55bae18894dc89c43246ada98f860dddacbb7aa57121f3c961",
+      "family": "T1218-f774b24cd636",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.003/atomic_red_team/sqlcmd_windows_sysmon.log",
+      "bytes": 16495,
+      "sha256": "e6f50e00a97eab28fe6d3d0f2ee99b5979a7214797d4380784d1bafaddb77d25",
+      "family": "T1059.003-4c0adeb066ef",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/atomic_red_team/hvci_windows-sysmon.log",
+      "bytes": 19322,
+      "sha256": "c7f4485d1cc21f919d6aa985ccdbc36d8553b20c9cf34c4a19e9dba46395ee1c",
+      "family": "T1562.001-f1c5df16f78b",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1547.001/atomic_red_team/bootexecute-windows-sysmon.log",
+      "bytes": 21929,
+      "sha256": "250282b2b0ccfe81a2d40f2fd21ccdaeba15d1b17f46ba102f9fd67f61d6b284",
+      "family": "T1547.001-e25947ee0fa3",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1547.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.011/atomic_red_team/ordinal_windows-sysmon.log",
+      "bytes": 21974,
+      "sha256": "441b465a0e8fb2c2989b11a37aed0485c17dbc75db54eae46fd54f16e4590450",
+      "family": "T1218.011-72a715818bd2",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.011"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055/trickbot_inf/windows-sysmon.log",
+      "bytes": 29704,
+      "sha256": "2de2f8e7685c98f215c90f137b7a8279ce50b986a5aedc654c88853ec4d17b12",
+      "family": "T1055-7938f1860750",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/malicious_cmd_line_samples/windows-sysmon.log",
+      "bytes": 32017,
+      "sha256": "64ab32d34f2e6aef53f80ae092a6caf9e3f737e362c522b9c1791e91b7defab4",
+      "family": "T1059.001-470e0de909f4",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1546.003/wmi_event_subscription/windows-sysmon.log",
+      "bytes": 33021,
+      "sha256": "1ce6602b7639621a9c5f6ccc2d2ba679fb5d196c84129c13f533b40a7acfe4df",
+      "family": "T1546.003-cec7a01cd874",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1546.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.002/auditpol_tampering/auditpol_tampering_sysmon.log",
+      "bytes": 33756,
+      "sha256": "a417ec3d8d48c9cdcf4d5bcfc834fe100ba8a03105bcf08305f5af40a830b363",
+      "family": "T1562.002-bdcad98a3e79",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.002"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055/named_pipes/windows-sysmon.log",
+      "bytes": 39508,
+      "sha256": "9c0237a14a9ee61476a5eaca97c406b0c249698bfef2049234609559d02de8c1",
+      "family": "T1055-692de0b617bc",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/pwh_defender_disabling/windows-sysmon.log",
+      "bytes": 42122,
+      "sha256": "8ab3d091f0a6fa2c6bff98af1ae1f6b523c9f450666a64bf0185c37d76480981",
+      "family": "T1562.001-f49ff0b5ea56",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/disable-windows-security-defender-features/windefender-bypas-2-sysmon.log",
+      "bytes": 44393,
+      "sha256": "18281db53af013649ebf55d7a600be05b20c3cbedb21d72ae91902d21c6cbac8",
+      "family": "T1562.001-b5d9efaaf475",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/trickbot_cmd_powershell/windows-sysmon.log",
+      "bytes": 46116,
+      "sha256": "7ba1d02c6b44d877cfef9f4c690515ae04edb2347581ea93bb9657cb864aeec7",
+      "family": "T1059.001-5afc37f4c781",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218/bitlockertogo/bitlockertogo_windows-sysmon.log",
+      "bytes": 50383,
+      "sha256": "8dd3604082c6e14318e8b8e3440c7912acd4112b47e616582d0ae1c34aa04674",
+      "family": "T1218-6e66d2ea840b",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055/sliver/notepad_windows-sysmon.log",
+      "bytes": 53340,
+      "sha256": "fbe287c3ddfef130124e7565bb00baa79872b4c420e692d902510211994468ee",
+      "family": "T1055-e3261914b268",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055"
+    },
+    {
+      "path": "datasets/attack_techniques/T1546.015/atomic_red_team/windows-sysmon.log",
+      "bytes": 55158,
+      "sha256": "7f05a6ee827e8fc7ff4130172feea93e29b342305d52cb2cace9f82daea621b0",
+      "family": "T1546.015-e4d5113b3edb",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1546.015"
+    },
+    {
+      "path": "datasets/attack_techniques/T1003.001/atomic_red_team/windows-sysmon_creddump.log",
+      "bytes": 65428,
+      "sha256": "a37b69dce32eaff6b5c1fdb4bb9cbea6dec78a4fbd22cd41362ab0e377f075ef",
+      "family": "T1003.001-2a01abf70bff",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1003.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059/metasploit/apachebench_windows-sysmon.log",
+      "bytes": 70120,
+      "sha256": "4e42aff31b9a33b2154a3c3a7abe3c39c2b973907bf6fb224890508e2fdaf8f9",
+      "family": "T1059-db13477cd57b",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/unmanaged_powershell_execution/windows-sysmon.log",
+      "bytes": 89107,
+      "sha256": "e7905b25fc39c794cf37e7c6ddfab273dc3f4ce61786556f9e61bd0bcc57300a",
+      "family": "T1059.001-f649458d5122",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059/autoit/sysmon.log",
+      "bytes": 89838,
+      "sha256": "a97cf678542378d2e601570980f086cba1980c5ead1a73c01656527c32cf607a",
+      "family": "T1059-47402ba099b6",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059"
+    },
+    {
+      "path": "datasets/attack_techniques/T1048.003/mass_file_creation/windows-sysmon.log",
+      "bytes": 105661,
+      "sha256": "798c9b571ec53e2fb1da62a8bd5d3103ef8c71575f0096c72e2f92f051a20e7a",
+      "family": "T1048.003-a30467808b31",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1048.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/soaphound/sysmon_soaphound.log",
+      "bytes": 118213,
+      "sha256": "99d01ead83b5a6d435c25fc101a1886a698ca0880c8da769d6914bbd23a475cc",
+      "family": "T1059.001-db342d3e27e9",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055.001/rasautou/windows-sysmon.log",
+      "bytes": 118807,
+      "sha256": "14017e4054137da4ab9a94f17ba71b5ac4a2750dfd0d56f24f269801747580e6",
+      "family": "T1055.001-b90940f76477",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1105/atomic_red_team/windows-sysmon_curl.log",
+      "bytes": 254432,
+      "sha256": "8f13a7382e2c6c2b32353971cd642fad77e929c7c26e37989bbeace4a0f381f5",
+      "family": "T1105-86b23b8845b5",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1105"
+    },
+    {
+      "path": "datasets/attack_techniques/T1053.005/taskschedule/sd_delete_windows-sysmon.log",
+      "bytes": 376865,
+      "sha256": "dc674b9030db4675edb2c205c71e8366850e7c7dc8ab3d94de1001a2c35a691f",
+      "family": "T1053.005-35b8d4c91d58",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1053.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1486/dcrypt/windows-sysmon.log",
+      "bytes": 439561,
+      "sha256": "c70b712dbfa68c6d1e982f032b386cf8dcaae031b34e380fdb875df4d9c838d3",
+      "family": "T1486-70857e4511fe",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1486"
+    },
+    {
+      "path": "datasets/attack_techniques/T1105/atomic_red_team/windows-sysmon_curl_upload.log",
+      "bytes": 475947,
+      "sha256": "af1602ccd961b0ae04cd5ca8c5c9dcbde01df6f86381bd9da67e6a3add5951ff",
+      "family": "T1105-d488793ff4ec",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1105"
+    },
+    {
+      "path": "datasets/attack_techniques/T1490/atomic_red_team/windows-sysmon.log",
+      "bytes": 510708,
+      "sha256": "b2d2d3e6a15185fa73e7ace39dd57a3d499f65a462f7101b215161e1ccbb8e96",
+      "family": "T1490-8869b38db668",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1490"
+    },
+    {
+      "path": "datasets/attack_techniques/T1204.002/single_letter_exe/windows-sysmon.log",
+      "bytes": 614098,
+      "sha256": "ac9411cc4c291c1b70925bf71633d2c4cdd6a51c1b5367c3a2ac12aab5642a76",
+      "family": "T1204.002-1998d86bdb7f",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1204.002"
+    },
+    {
+      "path": "datasets/attack_techniques/T1053.005/schtasks/windows-sysmon.log",
+      "bytes": 626881,
+      "sha256": "2af70b9815a95c0be345a10e7c833cbcd5c4dd6919040d7652396b008475acba",
+      "family": "T1053.005-47bd56ab6656",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1053.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.003/powershell_spawn_cmd/windows-sysmon.log",
+      "bytes": 957202,
+      "sha256": "ee1f07df0c6c5b9f76cb139bdc5d575a4b50b7e832465b5c3ba9dd5ea5f32cec",
+      "family": "T1059.003-b8368afc5302",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1204.002/atomic_red_team/windows-sysmon.log",
+      "bytes": 978377,
+      "sha256": "d600880b46feede4788b7d1512d97e255a34f0a398af45975d51363627dcf5c5",
+      "family": "T1204.002-a1d3f8454e3e",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1204.002"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon_dism.log",
+      "bytes": 996035,
+      "sha256": "c4c136f7115500f6303f1ed7ef2b7dd9170f523f7e84cde91c70d4f804ecddb0",
+      "family": "T1562.001-68747ac0a599",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055/cobalt_strike/windows-sysmon_searchprotocolhost.log",
+      "bytes": 1489733,
+      "sha256": "261129b0b1fc5237b6ac63b163ffd3e3674ce3dcdcfbc8fa6a3fe1116a239cc4",
+      "family": "T1055-26d44525994e",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055"
+    },
+    {
+      "path": "datasets/attack_techniques/T1036/write_to_recycle_bin/windows-sysmon.log",
+      "bytes": 1506694,
+      "sha256": "c7c968a58f0be7ca323530e296d3fea132fc203388026425ea5eaf4e7fc1a31b",
+      "family": "T1036-4410431f7869",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1036"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.003/cmd_spawns_cscript/windows-sysmon.log",
+      "bytes": 1645203,
+      "sha256": "8754cc0b57729054c87f9f5b2c79d648564f63dc91a23a73ba58ff410ca7f313",
+      "family": "T1059.003-14e1675a1af2",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/encoded_powershell/windows-sysmon.log",
+      "bytes": 2012605,
+      "sha256": "b9c8438a0d8cd62714a38ed093fc583c3318d1cac768c6513ad40a3b8203fd05",
+      "family": "T1059.001-554406a0068f",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.004/atomic_red_team/windows-sysmon.log",
+      "bytes": 2430831,
+      "sha256": "5f751c19cac61fa535293737e741d405f68cd650940e49913613f0b2e7e8e851",
+      "family": "T1218.004-06fe4c9800fa",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.004"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.007/atomic_red_team/windows-sysmon.log",
+      "bytes": 2713565,
+      "sha256": "deae351a3236ab7716b5ce154e282c2b2f984ac1a88b06e41814d3a466012e28",
+      "family": "T1218.007-41b7656bde36",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.007"
+    },
+    {
+      "path": "datasets/attack_techniques/T1546.008/atomic_red_team/windows-sysmon.log",
+      "bytes": 2943909,
+      "sha256": "6d60fc0ee30c2722588849952f594170747132ed6916f90514310ef3a0284c4f",
+      "family": "T1546.008-ec7de6ea2d28",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1546.008"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/delete_win_defender_context_menu/sysmon.log",
+      "bytes": 3020318,
+      "sha256": "e83ff83620cd67fec440e040d6b1a21198e8a455be04080e542f0765a00de310",
+      "family": "T1562.001-12c9d8dfa2d3",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/disable_defender_logging/sysmon.log",
+      "bytes": 3064595,
+      "sha256": "5a4b56945aa8474bb3b9ce30b22469a77f821a24c040447c0f1b557051a0c64b",
+      "family": "T1562.001-b13bd88198e7",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon_raccine.log",
+      "bytes": 3079745,
+      "sha256": "f6e66def655541bb6f82d14a2fa1a0769e5ee653b2fefbab2f94c73879d7fbc8",
+      "family": "T1562.001-b5bc0d1cff70",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.003/ryuk/windows-sysmon.log",
+      "bytes": 3430858,
+      "sha256": "62ab2627237caa7cac1ec4ed573618c459e8eb99edeb564f66023f6d8f065965",
+      "family": "T1059.003-5077c0d5eef6",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1105/atomic_red_team/windows-sysmon.log",
+      "bytes": 3625178,
+      "sha256": "bd6bbf7884f44274988d159bcb3249505dc53623e551892b54a3fc87db06e18c",
+      "family": "T1105-9a3c73683096",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1105"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059/path_traversal/sysmon.log",
+      "bytes": 4536016,
+      "sha256": "77cf39210cb8acde0119a97f8d707dc2b41c50429c7dbd559383d3384b6722bb",
+      "family": "T1059-eb5359b77a2c",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059"
+    },
+    {
+      "path": "datasets/attack_techniques/T1547.010/atomic_red_team/sysmon.log",
+      "bytes": 4778233,
+      "sha256": "cba7e1da30f22edd4261e0304427209b8052cdf818c3cd2af09b2a88bcf72ffd",
+      "family": "T1547.010-6e4756098701",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1547.010"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/sc_service_start_disabled/windows-sysmon.log",
+      "bytes": 4982097,
+      "sha256": "83ae68da1c0adccd5f8b9e8170aef56c815e3a36747b583be13cb93b4f28a38e",
+      "family": "T1562.001-31cad3c4b398",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1543.003/lateral_movement_powershell/windows-sysmon.log",
+      "bytes": 5304151,
+      "sha256": "e500ce256523846fbe81bbc74e43214c14acdccbc51f89c162362aedf3b0a27f",
+      "family": "T1543.003-e08dbb7be037",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1543.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1543.003/lateral_movement/windows-sysmon.log",
+      "bytes": 5502210,
+      "sha256": "8fbc5cc13241b190d25e9978d36be23b56a2e44fd8c6da0caf49546a1e32dd74",
+      "family": "T1543.003-69771d17a8e3",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1543.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1053.002/lateral_movement/windows-sysmon.log",
+      "bytes": 5502827,
+      "sha256": "58aecee33a94c56aa4617bcc4d0b60331207209dc3549b8e80a40fc5403ce408",
+      "family": "T1053.002-6013ab8e4918",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1053.002"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055/msra/raw-msra-windows-sysmon.log",
+      "bytes": 5554384,
+      "sha256": "498b7f8a9cf2934ddb66e3ebe6d98dfef7a4e044b8a5e8cfc4ece761cba1c806",
+      "family": "T1055-22f1df620c06",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055"
+    },
+    {
+      "path": "datasets/attack_techniques/T1053.005/lateral_movement_lolbas/windows-sysmon.log",
+      "bytes": 5583791,
+      "sha256": "722963980c277664e31993c1b4c4007906a014a9a718dd21cce04cf19e2ef799",
+      "family": "T1053.005-ff65910a9150",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1053.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1048.003/nslookup_exfil/windows-sysmon.log",
+      "bytes": 5663783,
+      "sha256": "5d7d8b9acd80ad09e962446a328901b29ba760e3b94aeb6b8ad41f0caddae27f",
+      "family": "T1048.003-42350f87233f",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1048.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1003/wdigest_enable/sysmon.log",
+      "bytes": 6213058,
+      "sha256": "c8ff8cfebf3357139e91a93390e82bf50dd00628f0ba077df46c11af4f03dd0e",
+      "family": "T1003-ef1d4a22748d",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1053.005/lateral_movement/windows-sysmon.log",
+      "bytes": 6297522,
+      "sha256": "b2fba83212dba31492fe34b90786e9019437ab25da78e22bc9688021c5e36825",
+      "family": "T1053.005-bb1c6eb0f885",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1053.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.010/atomic_red_team/windows-sysmon.log",
+      "bytes": 6329227,
+      "sha256": "b0d914a6318d8f6bb663430890ae71c1b3b462a5f698c0a3ff87552697dc40b7",
+      "family": "T1218.010-7b51f3e6bb00",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.010"
+    },
+    {
+      "path": "datasets/attack_techniques/T1543.003/lateral_movement_lolbas/windows-sysmon.log",
+      "bytes": 6466903,
+      "sha256": "559002df46a8ba3a5f5d7855a44a9414718b2465e0d7609a6f733fc317c74645",
+      "family": "T1543.003-42bf8256f8cc",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1543.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.009/atomic_red_team/windows-sysmon.log",
+      "bytes": 7189874,
+      "sha256": "6e30cfc58deee5ee2df382f790711b8e2e67410bcfbf0cf8cb9169a1760f7e43",
+      "family": "T1218.009-fe7f7def8bc4",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.009"
+    },
+    {
+      "path": "datasets/attack_techniques/T1547.003/timeprovider_reg/sysmon.log",
+      "bytes": 7461582,
+      "sha256": "9e09d4f161216094ccbde16a535e9e684f264afdf30a5216a3fb64b9e19df841",
+      "family": "T1547.003-9c03316d7b08",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1547.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1546.015/uac_colorui/windows-sysmon.log",
+      "bytes": 9445434,
+      "sha256": "39eb209747cc9cd395a1074815b3ed92232e885fcfe0f9e6ed91789358f39290",
+      "family": "T1546.015-aa75399a0dc3",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1546.015"
+    },
+    {
+      "path": "datasets/attack_techniques/T1055/cobalt_strike/windows-sysmon_dllhost.log",
+      "bytes": 9896197,
+      "sha256": "5403695c743517b297d5efcec9c609c1a77bb8ac12632df549f0b7bffd2c4959",
+      "family": "T1055-66a05688e945",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1055"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.005/vbs_wscript/sysmon.log",
+      "bytes": 10297824,
+      "sha256": "86ddf5d473d2be5d780dc171da8e00e33d572c9f387bb3d17aa3fc3e5b5ac2fc",
+      "family": "T1059.005-c1a88d62ae00",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/hotkey_disabled_hidden_user/windows-sysmon.log",
+      "bytes": 10576705,
+      "sha256": "28efd456106f6bd080835507f43d3808e045193d16992b19c22364b166fc69ff",
+      "family": "T1562.001-277891a1ecf7",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/powershell_xml_requests/windows-sysmon.log",
+      "bytes": 10784074,
+      "sha256": "c9c7f3a36611ed52e40b4f29440a45a07f1aac601a340f5ee4bf07fe5afa97b8",
+      "family": "T1059.001-86a33041765f",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/defender_exclusion_sysmon/sysmon.log",
+      "bytes": 11241416,
+      "sha256": "9898052d0f26516f344af733a7f58bcfe863848cdf1195549d94737c350bcd28",
+      "family": "T1562.001-06aa500f80b7",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1543.003/atomic_red_team/windows-sysmon.log",
+      "bytes": 11281916,
+      "sha256": "2e6ea9e053a84f4d32b37f462a40a39f1a90c2049adaf684b0660ee6e9f32d7a",
+      "family": "T1543.003-a4cd31e0aaf3",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1543.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1546.011/atomic_red_team/windows-sysmon.log",
+      "bytes": 11325099,
+      "sha256": "f92328c6565a653b760542cd397c58b046e48c8494214e0faa15662a58c4e20f",
+      "family": "T1546.011-9f8af8c3f2d2",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1546.011"
+    },
+    {
+      "path": "datasets/attack_techniques/T1547.001/atomic_red_team/windows-sysmon.log",
+      "bytes": 11357100,
+      "sha256": "11d8c6f7ca60994936ae9332ea67e5c220027ae1addad48203df6bdde9d46f5d",
+      "family": "T1547.001-1d4188cb3045",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1547.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1547.010/atomic_red_team/windows-sysmon.log",
+      "bytes": 11360587,
+      "sha256": "cb5ce3df232717ff0af910d8de6484d00005e52b94f310ddbeef0e9deb08bea4",
+      "family": "T1547.010-23b9fda46114",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1547.010"
+    },
+    {
+      "path": "datasets/attack_techniques/T1053.005/atomic_red_team/windows-sysmon.log",
+      "bytes": 11410982,
+      "sha256": "d346ab6c75b3151217dfc2c4c166c951fc16d68c31b7d5a8f3e577d9545ff9f0",
+      "family": "T1053.005-e241852f7c50",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1053.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1546.012/atomic_red_team/windows-sysmon.log",
+      "bytes": 11551638,
+      "sha256": "7d35dbd549a3b92a8d23cfc58569cdcd749840fedc0ea3b6759c8134d4bfbfa6",
+      "family": "T1546.012-6cc03e0e1983",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1546.012"
+    },
+    {
+      "path": "datasets/attack_techniques/T1036.003/atomic_red_team/windows-sysmon.log",
+      "bytes": 12615448,
+      "sha256": "c9e2c2d4c29fa0e6054617b0743cb2574b28aa03a6560d80e4a66a4ee607aa75",
+      "family": "T1036.003-e7206df246ad",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1036.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1003.002/atomic_red_team/windows-sysmon.log",
+      "bytes": 12789744,
+      "sha256": "ae66c083bde9f793ebaa7f15807a99645b15d6f958894349e5026ced597665ea",
+      "family": "T1003.002-f17229855b35",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1003.002"
+    },
+    {
+      "path": "datasets/attack_techniques/T1003.003/atomic_red_team/windows-sysmon.log",
+      "bytes": 12883992,
+      "sha256": "ee1c7cd9fa20013c82da17f8cb1998197c117ab4c209ab56203290bc90739fda",
+      "family": "T1003.003-e3c31416aaf4",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1003.003"
+    },
+    {
+      "path": "datasets/attack_techniques/T1218.001/atomic_red_team/windows-sysmon.log",
+      "bytes": 13124256,
+      "sha256": "d486e2796889ece91e3c97d34fd4b2a134c4ed808d5efbb03be30b8b424b808c",
+      "family": "T1218.001-c5b2b7178dae",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1218.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1490/ransomware_notes/windows-sysmon.log",
+      "bytes": 13207163,
+      "sha256": "92e525d40727e179b1f5730ad1ad1025093e76431d63cf842710f388a21fb7a4",
+      "family": "T1490-6d19ebc5802b",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1490"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/powershell_testing/windows-sysmon.log",
+      "bytes": 13630939,
+      "sha256": "fa2961e63bef58669c7a634b1466bfa540fc836730cffb2959bf6fc56ad01eb4",
+      "family": "T1059.001-0772b2958739",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/win_defend_service_stop/windows-sysmon.log",
+      "bytes": 13833365,
+      "sha256": "f9dc84160d71a405117cbf792cb724bfe2779d1e0406e9be387ba591ceaacd71",
+      "family": "T1562.001-b1952cd90a6b",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1003.001/atomic_red_team/windows-sysmon.log",
+      "bytes": 14235927,
+      "sha256": "a1905850598f1e943708c3329190e29c6cb046389c1575cb2afd6369b5f269f1",
+      "family": "T1003.001-925535686575",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1003.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon.log",
+      "bytes": 14504430,
+      "sha256": "696e1d2800d215e13c8f1ea5252cf2c2118e1018c1cacda82c041fdbeeac403d",
+      "family": "T1562.001-2f6952bd5dbe",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1562.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/powershell_execution_policy/windows-sysmon.log",
+      "bytes": 14601853,
+      "sha256": "7854054b5fa788e7c430b7045ddbebb09be43300d2b0b2478cb893e70aaaca41",
+      "family": "T1059.001-d9d800a88487",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1059.001/sharphound/windows-sysmon.log",
+      "bytes": 14699348,
+      "sha256": "29f4f1a561c219f2fe98db0e1269417a7632804c1431a9f1fadfccfba4f170c0",
+      "family": "T1059.001-c09be6c48daf",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1059.001"
+    },
+    {
+      "path": "datasets/attack_techniques/T1053.005/schtask_shutdown/windows-sysmon.log",
+      "bytes": 15400399,
+      "sha256": "cafa411c6706fab418e8f26735a96298de18bc7d041d8702a8c2ad0c819eb98e",
+      "family": "T1053.005-7a5c7c88d18f",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1053.005"
+    },
+    {
+      "path": "datasets/attack_techniques/T1486/sam_sam_note/windows-sysmon.log",
+      "bytes": 15592223,
+      "sha256": "ffb8daf49a0cfbfe4514eba0f340580ac88e0055a313c4880e64b251bf6da208",
+      "family": "T1486-84fa9d6c266a",
+      "source_context": "attack technique lab trace; includes background activity",
+      "technique": "T1486"
+    }
+  ],
+  "notices": [
+    {
+      "path": "LICENSE",
+      "bytes": 11344,
+      "sha256": "8505946b2464fa90223996d99eecbc7639a86648ca071f0cac21695be2623a0a"
+    },
+    {
+      "path": "README.md",
+      "bytes": 6499,
+      "sha256": "849931b69b5ec45132478071de895ab0e12503b5bc9864ae129137ed443c0ae2"
+    }
+  ],
+  "selection": "Distinct SHA-256 text logs, supported Windows Sysmon format, broad technique coverage ordered by size within 450 MB of new telemetry. Prior 16 pinned logs reused.",
+  "excluded_sources": [
+    {
+      "repository": "OTRF/Security-Datasets",
+      "reason": "README and LICENSE currently disagree on license; compressed datasets also need a separate bounded importer."
+    }
+  ]
+}

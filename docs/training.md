@@ -175,3 +175,51 @@ the finalization report is tied to the stopped run and exact saved weights. This
 does not resume optimizer state or imply the interrupted epochs completed.
 Measured comparisons and remaining false actions are in the
 [M14 record](plans/M14-whohack-and-data.md). The model remains disabled.
+
+## Download behavior continuation (M16)
+
+The next corpus adds 122 pinned Sysmon text logs from the same Apache-2.0
+[Splunk source](https://github.com/splunk/attack_data), spanning 46 source
+technique identifiers. New logs use 437,643,567 bytes; 16 existing logs are reused
+through hardlinks. The acquisition cap is 500 MB of new data, 30 MB per log.
+Byte counts, hashes, source revision and upstream notices are checked before
+import. A technique name describes source context, not a per-process label.
+
+The 138-log import produces 90 distinct provisional training cases from 32 source
+groups: 43 credential-access concerns, 31 persistence concerns and 16 injection
+concerns. All are `suspicious` / `ask_user`, unreviewed and training-only.
+Of 20,396 candidate windows, 20,180 lack suitable mapped evidence and 126 duplicate
+another state. They are not relabeled benign. Only 31 selected application
+identities have recorded image hashes; 59 explicitly use path-derived identities.
+LSASS memory-read permission is not proof that memory was actually read.
+Process-local ordering is preserved, but shared-image network history across
+processes is not a fully chronological replay.
+
+The purpose-specific generator adds 66 authored recipes and 160 states, covering
+ordinary media playback, games, updates and documents; uncertain behavior; and
+corroborated credential theft, exfiltration, injection, persistence and impact.
+It selects relevant application categories rather than repeating every recipe
+across all categories. Extensions and input association are saved as metadata;
+the existing model state does not expose them. These are not decoder exploit
+tests or measurements of live sensor-to-response latency.
+
+The frozen combined corpus has 1,067 cases: 977 training, 28 selection,
+26 calibration and 36 test. It retains 827 old training cases, incorporates all
+90 public cases, and discards ten duplicate inputs. All 1,102 previous M13/M14
+evaluation rows remain excluded by identity, family, application hash and state.
+The small authored holdout and shared behavior primitives do not establish
+real-world detection accuracy.
+
+```powershell
+ml/.venv/Scripts/python.exe ml/acquire_behavior_telemetry.py --output .vigil/training/public-splunk-v2 --reuse .vigil/training/public-splunk
+ml/.venv/Scripts/python.exe ml/import_sysmon.py --source .vigil/training/public-splunk-v2 --service target/release/whohack-service.exe --output NEW_PUBLIC_OUTPUT
+ml/.venv/Scripts/python.exe ml/download_scenarios.py --service target/release/whohack-service.exe --previous .vigil/training/whohack-expanded-v1/dataset.jsonl --public NEW_PUBLIC_OUTPUT/dataset.jsonl --exclude-evaluation .vigil/training/laya-security-v2/dataset.jsonl --output NEW_DATASET_OUTPUT
+```
+
+Use new directories for generation and training. `ml/audit_download_decisions.py`
+adds post-selection error analysis by application category and family, including
+restrictive recommendations for uncertain activity, unnecessary quarantine and
+missed malicious actions. It compares parent/candidate predictions on the same
+frozen test with identical operating thresholds, and never tunes or qualifies
+the model. See the [M16 record](plans/M16-download-decisions.md) for actual
+training, resource and compatibility results.

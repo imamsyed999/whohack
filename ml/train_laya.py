@@ -165,6 +165,8 @@ def train(args):
     args.output.mkdir(parents=True)
     (args.output / 'training-source.py').write_bytes(Path(__file__).read_bytes())
     (args.output / 'training-budget-source.py').write_bytes(Path(__file__).with_name('training_budget.py').read_bytes())
+    if args.gpu_telemetry == 'nvml':
+        (args.output / 'nvml-telemetry-source.py').write_bytes(Path(__file__).with_name('nvml_telemetry.py').read_bytes())
     budget = Budget(allocator_bytes=args.allocator_gb * 1_000_000_000, max_seconds=args.max_minutes * 60)
     report = dict(qualified=False, status='starting', backend='laya', laya_version=PINNED_LAYA,
                   dataset_sha256=sha256(args.dataset), base_weights_sha256=sha256(base / 'model.safetensors'),
@@ -177,8 +179,11 @@ def train(args):
                               for role, group in groups.items()}, history=[], budget=asdict(budget),
                   evaluation_uses='test once after checkpoint selection; calibration families separate',
                   automatic_response_enabled=False)
+    report['gpu_telemetry'] = args.gpu_telemetry
+    if args.gpu_telemetry == 'nvml':
+        report['telemetry_worker_sha256'] = sha256(Path(__file__).with_name('nvml_telemetry.py'))
     write_json(args.output / 'training-report.json', report)
-    guard = ResourceGuard(args.output, budget)
+    guard = ResourceGuard(args.output, budget, telemetry_backend=args.gpu_telemetry)
     try:
         guard.start(torch)
         print('Loading local Laya; allocator capped at', budget.allocator_bytes, 'bytes', flush=True)
@@ -349,5 +354,6 @@ if __name__ == '__main__':
     p.add_argument('--micro-batch', type=int, default=4)
     p.add_argument('--allocator-gb', type=int, default=16)
     p.add_argument('--max-minutes', type=int, default=90)
+    p.add_argument('--gpu-telemetry', choices=['nvidia-smi', 'nvml'], default='nvidia-smi')
     p.add_argument('--allow-synthetic', action='store_true')
     train(p.parse_args())

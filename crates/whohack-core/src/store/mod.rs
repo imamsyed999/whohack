@@ -7,6 +7,7 @@
 
 mod alerts;
 mod allowlist;
+mod downloads;
 mod events;
 mod files;
 mod history;
@@ -20,6 +21,7 @@ use rusqlite::Connection;
 use serde::de::DeserializeOwned;
 
 pub use alerts::{AlertRecord, AlertStatus, DecisionRecord, FeedbackRecord};
+pub use downloads::DownloadActivity;
 pub use history::HistoryPruned;
 pub use profiles::ProfileRecord;
 pub use schema::SCHEMA_VERSION;

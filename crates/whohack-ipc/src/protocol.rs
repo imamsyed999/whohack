@@ -32,6 +32,19 @@ pub enum Request {
     ListAlerts {
         limit: u32,
     },
+    /// Download-associated processes and bounded recent behavior, not verdicts.
+    ListDownloads {
+        limit: u32,
+    },
+    FolderScanStatus,
+    StartFolderScan {
+        path: String,
+        /// Explicit user choice; false uses Defender's report-only custom scan.
+        remediate: bool,
+    },
+    StopFolderScan {
+        id: u64,
+    },
     /// The user's decision on an alert; stored as feedback.
     Resolve {
         alert_id: i64,
@@ -111,6 +124,14 @@ pub enum Response {
     Alerts {
         alerts: Vec<AlertSummary>,
     },
+    Downloads {
+        downloads: Vec<DownloadSummary>,
+    },
+    FolderScan {
+        available: bool,
+        limitation: String,
+        scan: Option<FolderScanSummary>,
+    },
     Allowlist {
         entries: Vec<AllowEntry>,
     },
@@ -136,6 +157,10 @@ pub struct StatusInfo {
     pub service_version: String,
     #[serde(default)]
     pub service_pid: u32,
+    #[serde(default)]
+    pub download_activity_available: bool,
+    #[serde(default)]
+    pub folder_scan_available: bool,
     pub mode: ResponseMode,
     pub collectors: Vec<String>,
     pub dns_visible: bool,
@@ -218,6 +243,56 @@ pub struct AlertSummary {
     pub action: Action,
     pub explanation: String,
     pub resolved: bool,
+    #[serde(default)]
+    pub downloaded_files: Vec<DownloadFileSummary>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DownloadFileSummary {
+    pub path: String,
+    /// executed, script, observed_read, launch_argument, or inherited.
+    pub evidence: String,
+    pub observed_at: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DownloadSummary {
+    pub pid: u32,
+    pub start_time: i64,
+    pub app: String,
+    /// None means no exit was recorded, not proof of liveness.
+    pub exit_time: Option<i64>,
+    pub files: Vec<DownloadFileSummary>,
+    pub events: Vec<EventSummary>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FolderScanState {
+    Running,
+    Completed,
+    ReviewRequired,
+    Failed,
+    Stopped,
+    TimedOut,
+}
+
+/// One optional Defender job. Output is bounded and never parsed as executable
+/// paths or used to authorize a whohack quarantine operation.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FolderScanSummary {
+    pub id: u64,
+    pub path: String,
+    pub engine: String,
+    pub remediate: bool,
+    pub state: FolderScanState,
+    pub started_at: i64,
+    pub finished_at: Option<i64>,
+    pub elapsed_s: u64,
+    pub exit_code: Option<i32>,
+    pub output: String,
+    pub output_truncated: bool,
+    pub message: String,
 }
 
 /// One timeline row.
@@ -243,6 +318,10 @@ pub enum PushEvent {
     /// Sent when protection is degraded (a collector stopped, a block was removed externally).
     Health {
         ok: bool,
+        message: String,
+    },
+    FolderScanFinished {
+        id: u64,
         message: String,
     },
 }

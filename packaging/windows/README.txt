@@ -5,6 +5,16 @@ whohack.exe or Start whohack.cmd. Requires Windows 10 22H2+ or Windows 11 x64,
 Microsoft Edge WebView2 and the Microsoft Visual C++ x64 runtime.
 Python, Rust and WSL are not required to run this package.
 
+The Download activity screen shows observed files, opening apps and recent
+behavior. File reads and launch arguments are labeled separately; a connection
+alone does not mean malware. Alerts and Actions & files show detections, actual
+pauses and quarantine. Protection settings explains coverage and sensor gaps.
+For an older session already running from this folder, right-click
+Update whohack.cmd and choose Run as administrator. It gracefully restarts the
+local session with the existing configuration and data. Native file monitoring
+requires administrator rights. Do not disable Windows security if it blocks an
+unsigned build.
+
 The launcher starts native Windows service and tray executables. No administrator
 rights are needed. It monitors Windows processes and TCP connections through
 ToolHelp/IP Helper. The tray window opens immediately; closing it keeps the tray
@@ -30,6 +40,7 @@ Application Control may reject unsigned executables. Keep Windows security and
 your existing antivirus enabled.
 Current whohack 0.1.1 build checks and model limitations are recorded in
 docs\plans\M14-whohack-and-data.md. Earlier dated reports describe their own builds.
+The current download/UI checks are in docs\plans\M15-download-activity.md.
 
 Default mode is monitor and response is disabled. Events, rule matches and alerts
 are recorded without changing processes or network access. Optional response

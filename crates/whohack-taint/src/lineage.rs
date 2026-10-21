@@ -153,12 +153,35 @@ impl ProcessTracker {
             .iter_mut()
             .find(|i| i.file.path == input.file.path)
         {
-            // A later duplicate command line must not downgrade a real read.
-            let read_observed = previous.read_observed || input.read_observed;
+            // Keep the first association for the same bytes in this process.
+            // Repeated playback reads must not erase the earlier network window.
+            // An inherited parent read is not proof that this child read a file.
+            let same_local_input =
+                previous.observed_at >= p.start_time && previous.file.sha256 == input.file.sha256;
+            let read_observed = (same_local_input && previous.read_observed) || input.read_observed;
+            let observed_at = if same_local_input {
+                previous.observed_at.min(input.observed_at)
+            } else {
+                input.observed_at
+            };
             *previous = input;
             previous.read_observed = read_observed;
+            previous.observed_at = observed_at;
         } else if p.downloaded_inputs.len() < crate::downloads::MAX_INPUTS {
             p.downloaded_inputs.push(input);
+        } else {
+            // A long-running parent can fill all inherited slots. Never let
+            // that prevent a child/player's newly opened download being tracked.
+            // Prefer evicting inherited context, then the oldest local input.
+            let oldest = p
+                .downloaded_inputs
+                .iter()
+                .enumerate()
+                .min_by_key(|(_, entry)| (entry.observed_at >= p.start_time, entry.observed_at))
+                .map(|(index, _)| index);
+            if let Some(index) = oldest {
+                p.downloaded_inputs[index] = input;
+            }
         }
         p.tainted = true;
         p.taint_root = p.taint_root.or(Some(pid));
@@ -232,6 +255,71 @@ mod tests {
             script: None,
             path_class: PathClass::Other,
         }
+    }
+
+    #[test]
+    fn full_inherited_context_cannot_hide_a_new_download() {
+        let mut t = ProcessTracker::default();
+        t.start(start(10, 0, 100, file("/parent", false, 1)));
+        for n in 0..crate::downloads::MAX_INPUTS {
+            t.attach_input(
+                10,
+                200,
+                DownloadedInput {
+                    file: file(&format!("/Downloads/{n}.wav"), true, n as u8),
+                    observed_at: 200 + n as i64,
+                    read_observed: true,
+                },
+            );
+        }
+        t.start(start(11, 10, 400, file("/player", false, 20)));
+        let newest = DownloadedInput {
+            file: file("/Downloads/new.wav", true, 30),
+            observed_at: 500,
+            read_observed: true,
+        };
+        t.attach_input(11, 500, newest.clone());
+        let inputs = &t.get(11).unwrap().downloaded_inputs;
+        assert_eq!(inputs.len(), crate::downloads::MAX_INPUTS);
+        assert!(inputs.contains(&newest));
+        assert!(!inputs.iter().any(|f| f.file.path == "/Downloads/0.wav"));
+        assert!(!t.get(10).unwrap().downloaded_inputs.contains(&newest));
+        // All-local full viewers also retain a newly opened input within the cap.
+        t.attach_input(10, 600, newest.clone());
+        assert!(t.get(10).unwrap().downloaded_inputs.contains(&newest));
+    }
+
+    #[test]
+    fn repeated_reads_keep_window_but_replaced_bytes_and_child_reads_do_not() {
+        let mut t = ProcessTracker::default();
+        t.start(start(10, 0, 100, file("/player", false, 1)));
+        let mut input = DownloadedInput {
+            file: file("/Downloads/audio.wav", true, 2),
+            observed_at: 200,
+            read_observed: true,
+        };
+        t.attach_input(10, 200, input.clone());
+        input.observed_at = 300;
+        input.read_observed = false;
+        t.attach_input(10, 300, input.clone());
+        let first = t.get(10).unwrap().downloaded_inputs[0].clone();
+        assert_eq!(first.observed_at, 200);
+        assert!(first.read_observed);
+        t.start(start(11, 10, 400, file("/child", false, 3)));
+        input.observed_at = 500;
+        t.attach_input(11, 500, input.clone());
+        let child = t.get(11).unwrap().downloaded_inputs[0].clone();
+        assert_eq!(child.observed_at, 500);
+        assert!(
+            !child.read_observed,
+            "a parent read cannot confirm a child read"
+        );
+        input.file.sha256 = [4; 32];
+        input.observed_at = 600;
+        t.attach_input(10, 600, input);
+        let replaced = t.get(10).unwrap().downloaded_inputs[0].clone();
+        assert_eq!(replaced.observed_at, 600);
+        assert!(!replaced.read_observed);
     }
 
     #[test]

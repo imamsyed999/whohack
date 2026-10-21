@@ -33,6 +33,7 @@ lru.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows-service.workspace = true
+windows-sys = { workspace = true, features = ["Win32_UI_Shell", "Win32_System_Com"] }
 
 [dev-dependencies]
 async-trait.workspace = true

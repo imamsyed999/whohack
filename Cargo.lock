@@ -3381,6 +3381,7 @@ dependencies = [
  "whohack-tags",
  "whohack-taint",
  "windows-service",
+ "windows-sys",
 ]
 
 [[package]]

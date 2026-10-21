@@ -15,12 +15,27 @@ Local model research uses Laya/OpenDecider; no model is enabled by default, and
 the development fine-tunes have not passed detection-quality checks. See
 [download protection and resource limits](docs/download-protection.md).
 
+The [M16 data/training record](docs/plans/M16-download-decisions.md) adds public
+behavior telemetry and download-specific scenarios. Its three training attempts
+stopped on stale GPU telemetry before completing an epoch; no new model was
+activated. [Optional Defender folder checks](docs/plans/M16-optional-folder-check.md)
+are implemented with a report-only default, but the new native integration test
+is blocked by Windows Application Control on this development PC.
+
 The product and source packages are now named **whohack** (version 0.1.1).
 Existing `.vigil` data and `vigil.db` remain compatible storage locations, so the
 rename preserves configuration, history and quarantine. The
 [rename and expanded training record](docs/plans/M14-whohack-and-data.md) records
 the new builds and their limits. Unsigned previews may be blocked by Windows
 Application Control; they require an approved signing/distribution path.
+
+The **Download activity** home screen shows recorded files, their opening apps,
+and recent observed behavior. It distinguishes a real file read from a launch
+argument and makes offline or incomplete monitoring visible. See the
+[download and UI validation record](docs/plans/M15-download-activity.md).
+If an older Vigil service is already running, right-click **`Update whohack.cmd`**
+and choose **Run as administrator** to apply the new build in this folder.
+This gracefully restarts the local session with its existing configuration.
 
 > **Status: native Windows monitoring preview, in development.** Implemented:
 >

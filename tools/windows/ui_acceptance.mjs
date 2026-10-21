@@ -66,13 +66,17 @@ try {
   assert.equal(await evaluate('(async () => (await window.__TAURI__.core.invoke("status")).service_pid)()'), Number(servicePid));
   await evaluate('window.__TAURI__.core.invoke("set_mode", { mode: "prompt" })');
   await evaluate('document.getElementById("mode").value="prompt"; document.getElementById("mode").dispatchEvent(new Event("change"))');
-  const promptPill = downloadPause ? 'Download danger pause' : 'Response';
+  const promptPill = downloadPause ? 'Danger pause on' : 'ask before acting';
   await until(`document.getElementById("conn").textContent.includes(${JSON.stringify(promptPill)})`);
   assert.equal(await evaluate('document.querySelector("#mode option[value=auto]").disabled'), true);
   assert.equal(await evaluate('document.querySelector("#mode option[value=prompt]").disabled'), false);
   assert.match(await evaluate('document.getElementById("response-mode-note").textContent'), downloadPause
     ? /automatically pauses strong download-related danger signals/
     : /Every action requires your confirmation/);
+  assert.equal(await evaluate('document.title'), 'whohack');
+  await tab('downloads');
+  await until('document.getElementById("downloads-message").textContent.includes("No downloaded-file opens recorded") || document.querySelectorAll("#downloads .download").length > 0');
+  assert.match(await evaluate('document.getElementById("tracking-value").textContent'), /Limited tracking/);
   await tab('timeline');
   await until('document.querySelectorAll("#timeline tr").length > 0');
   await tab('profiles');
@@ -94,6 +98,8 @@ try {
   await until('document.getElementById("status").textContent.includes("windows-poll")');
   assert.equal(await evaluate('document.querySelector("#mode option[value=auto]").disabled'), true);
   assert.deepEqual(exceptions, []);
+  await tab('downloads');
+  await until('document.getElementById("tracking-value").textContent.includes("Limited tracking")');
   const capture = await command('Page.captureScreenshot', { format: 'png' });
   await writeFile(screenshot, Buffer.from(capture.data, 'base64'));
   console.log('PASS: real WebView2 UI acceptance');
